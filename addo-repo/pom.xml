@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>addo-repo</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>addo-repo Repository AMP project</name>
+    <packaging>amp</packaging>
+    <description>Manages the lifecycle of the addo-repo Repository AMP (Alfresco Module Package)</description>
+
+    <parent>
+        <groupId>dk.openesdh.addo</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <properties>
+        <dynamicextensionsalfresco.version>1.0-SNAPSHOT</dynamicextensionsalfresco.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>${alfresco.groupId}</groupId>
+                <artifactId>alfresco-platform-distribution</artifactId>
+                <version>${alfresco.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>dk.openesdh</groupId>
+            <artifactId>openesdh-repo</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <classifier>classes</classifier>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>addo-ws</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
+        <!-- Following dependencies are needed for compiling Java code in src/main/java;
+             <scope>provided</scope> is inherited for each of the following;
+             for more info, please refer to alfresco-platform-distribution POM -->
+        <dependency>
+            <groupId>${alfresco.groupId}</groupId>
+            <artifactId>alfresco-repository</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.alfresco</groupId>
+            <artifactId>alfresco-repository</artifactId>
+            <version>${alfresco.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.alfresco</groupId>
+            <artifactId>alfresco-remote-api</artifactId>
+            <version>${alfresco.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.extensions.surf</groupId>
+            <artifactId>spring-webscripts</artifactId>
+            <version>${alfresco.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.github.dynamicextensionsalfresco</groupId>
+            <artifactId>annotations</artifactId>
+            <version>${dynamicextensionsalfresco.version}</version>
+            <type>amp</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.github.dynamicextensionsalfresco</groupId>
+            <artifactId>webscripts</artifactId>
+            <version>${dynamicextensionsalfresco.version}</version>
+            <type>amp</type>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+
+        <!--
+            If the 'amp-to-war' profile is enabled then make sure to bring in the alfresco-rad module,
+            which has the H2 scripts and other RAD features.
+
+            TODO: TO INVESTIGATE: This dependency is already defined in the parent SDK pom in the 'amp-to-war' profile
+                  but this does not work, it is not include...
+            -->
+        <profile>
+            <id>amp-to-war</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.alfresco.maven</groupId>
+                    <artifactId>alfresco-rad</artifactId>
+                    <version>${maven.alfresco.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+</project>

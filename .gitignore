@@ -1,0 +1,12 @@
+target
+.idea
+alf_data_dev
+*.iml
+.idea
+.DS_Store
+.project
+.classpath
+.settings
+alfresco.log
+*.log*
+nbactions.xml

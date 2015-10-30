@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+   <!--<import resource="classpath:alfresco/module/openesdh-repo/module-context.xml"/>-->
+
+   <!--<bean id="CaseService" class="dk.openesdh.repo.services.cases.CaseServiceImpl"></bean>-->
+   <!--<bean id="DocumentService" class="dk.openesdh.repo.services.documents.DocumentServiceImpl"></bean>-->
+</beans>
