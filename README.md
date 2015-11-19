@@ -13,6 +13,8 @@ development
 ----------------
 To run project integrated with OpenESDH-core:
 ```
+../OpenESDH/openesdh-addo > mvn install
+
 ../OpenESDH/openesdh-core/openesdh-repo > export MAVEN_OPTS="..."
 
 ../OpenESDH/openesdh-core/openesdh-repo > mvn integration-test -Pvisma-addo,amp-with-solr,unpack-deps
