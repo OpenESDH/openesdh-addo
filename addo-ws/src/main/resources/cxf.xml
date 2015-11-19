@@ -1,0 +1,25 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:http-conf="http://cxf.apache.org/transports/http/configuration"
+       xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xmlns:sec="http://cxf.apache.org/configuration/security"
+       xmlns:cxf="http://cxf.apache.org/core"
+       xsi:schemaLocation="http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+           http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd
+           http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
+    
+<!--    <cxf:bus>
+        <cxf:features>
+            <cxf:logging></cxf:logging>
+        </cxf:features>
+    </cxf:bus>-->
+    
+    <http-conf:conduit name="*.http-conduit">
+        <http-conf:client Connection="Keep-Alive"
+                          MaxRetransmits="1"
+                          AutoRedirect="true"
+                          AllowChunking="false" />
+    </http-conf:conduit>
+</beans>

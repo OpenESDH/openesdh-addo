@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified" targetNamespace="http://schemas.vismaaddo.dk/services/signingservice/messages/restinitiatesigningrequest/2014/09" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://schemas.vismaaddo.dk/services/signingservice/messages/restinitiatesigningrequest/2014/09">
+	<xs:import schemaLocation="InitiateSigningRequest.xsd" namespace="http://schemas.vismaaddo.dk/services/signingservice/messages/initiatesigningrequest/2014/09"/>
+	<xs:complexType name="RestInitiateSigningRequest">
+		<xs:complexContent mixed="false">
+			<xs:extension base="q1:InitiateSigningRequest" xmlns:q1="http://schemas.vismaaddo.dk/services/signingservice/messages/initiatesigningrequest/2014/09">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="Email" nillable="true" type="xs:string"/>
+					<xs:element minOccurs="0" name="Password" nillable="true" type="xs:string"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="RestInitiateSigningRequest" nillable="true" type="tns:RestInitiateSigningRequest"/>
+</xs:schema>

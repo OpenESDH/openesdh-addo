@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified" targetNamespace="http://schemas.vismaaddo.dk/services/signingservice/messages/initiatesigningrequest/2014/09" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://schemas.vismaaddo.dk/services/signingservice/messages/initiatesigningrequest/2014/09" xmlns:ser="http://schemas.microsoft.com/2003/10/Serialization/">
+	<xs:import schemaLocation="VismaAddoContracts.xsd" namespace="http://schemas.datacontract.org/2004/07/Visma.Addo.WebService.Contracts.v1_0.Messages"/>
+	<xs:import schemaLocation="Serialization.xsd" namespace="http://schemas.microsoft.com/2003/10/Serialization/"/>
+	<xs:complexType name="InitiateSigningRequest">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="Name" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="SigningData" nillable="true" type="q1:Signing" xmlns:q1="http://schemas.datacontract.org/2004/07/Visma.Addo.WebService.Contracts.v1_0.Messages"/>
+			<xs:element minOccurs="0" name="SigningTemplateId" type="ser:guid"/>
+			<xs:element minOccurs="0" name="StartDate" type="xs:dateTime"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="InitiateSigningRequest" nillable="true" type="tns:InitiateSigningRequest"/>
+</xs:schema>

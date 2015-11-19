@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified" targetNamespace="http://schemas.vismaaddo.dk/services/signingservice/messages/generatedocumentrequest/2014/09" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://schemas.vismaaddo.dk/services/signingservice/messages/generatedocumentrequest/2014/09" xmlns:ser="http://schemas.microsoft.com/2003/10/Serialization/">
+	<xs:import schemaLocation="VismaAddoContracts.xsd" namespace="http://schemas.datacontract.org/2004/07/Visma.Addo.WebService.Contracts.v1_0.Messages"/>
+	<xs:import schemaLocation="Serialization.xsd" namespace="http://schemas.microsoft.com/2003/10/Serialization/"/>
+	<xs:complexType name="GenerateDocumentRequest">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="DocumentTemplate" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="DocumentTemplateName" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="SigningData" nillable="true" type="q1:Signing" xmlns:q1="http://schemas.datacontract.org/2004/07/Visma.Addo.WebService.Contracts.v1_0.Messages"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="GenerateDocumentRequest" nillable="true" type="tns:GenerateDocumentRequest"/>
+	<xs:complexType name="GetSigningResponse">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="Name" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="OutboundEnclosures" nillable="true" type="tns:ArrayOfGetSigningResponse.Document"/>
+			<xs:element minOccurs="0" name="Recipients" nillable="true" type="tns:ArrayOfGetSigningResponse.Recipient"/>
+			<xs:element minOccurs="0" name="Token" nillable="true" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="GetSigningResponse" nillable="true" type="tns:GetSigningResponse"/>
+	<xs:complexType name="ArrayOfGetSigningResponse.Document">
+		<xs:sequence>
+			<xs:element minOccurs="0" maxOccurs="unbounded" name="GetSigningResponse.Document" nillable="true" type="tns:GetSigningResponse.Document"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ArrayOfGetSigningResponse.Document" nillable="true" type="tns:ArrayOfGetSigningResponse.Document"/>
+	<xs:complexType name="GetSigningResponse.Document">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="Data" nillable="true" type="xs:base64Binary"/>
+			<xs:element minOccurs="0" name="MimeType" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="Name" nillable="true" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="GetSigningResponse.Document" nillable="true" type="tns:GetSigningResponse.Document"/>
+	<xs:complexType name="ArrayOfGetSigningResponse.Recipient">
+		<xs:sequence>
+			<xs:element minOccurs="0" maxOccurs="unbounded" name="GetSigningResponse.Recipient" nillable="true" type="tns:GetSigningResponse.Recipient"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ArrayOfGetSigningResponse.Recipient" nillable="true" type="tns:ArrayOfGetSigningResponse.Recipient"/>
+	<xs:complexType name="GetSigningResponse.Recipient">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="Documents" nillable="true" type="tns:ArrayOfGetSigningResponse.SigningDocument"/>
+			<xs:element minOccurs="0" name="ID" type="xs:int"/>
+			<xs:element minOccurs="0" name="XmlData" nillable="true" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="GetSigningResponse.Recipient" nillable="true" type="tns:GetSigningResponse.Recipient"/>
+	<xs:complexType name="ArrayOfGetSigningResponse.SigningDocument">
+		<xs:sequence>
+			<xs:element minOccurs="0" maxOccurs="unbounded" name="GetSigningResponse.SigningDocument" nillable="true" type="tns:GetSigningResponse.SigningDocument"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ArrayOfGetSigningResponse.SigningDocument" nillable="true" type="tns:ArrayOfGetSigningResponse.SigningDocument"/>
+	<xs:complexType name="GetSigningResponse.SigningDocument">
+		<xs:complexContent mixed="false">
+			<xs:extension base="tns:GetSigningResponse.Document">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="InboundEnclosures" nillable="true" type="tns:ArrayOfGetSigningResponse.Document"/>
+					<xs:element minOccurs="0" name="XmlDSig" nillable="true" type="xs:string"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="GetSigningResponse.SigningDocument" nillable="true" type="tns:GetSigningResponse.SigningDocument"/>
+	<xs:complexType name="GetSigningSatus">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="Name" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="SigningToken" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="TransactionToken" type="ser:guid"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="GetSigningSatus" nillable="true" type="tns:GetSigningSatus"/>
+</xs:schema>

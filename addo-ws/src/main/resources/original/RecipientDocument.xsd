@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified" targetNamespace="http://schemas.vismaaddo.dk/services/signingservice/messages/generatedocumentresponse/recipientdocument/2014/09" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://schemas.vismaaddo.dk/services/signingservice/messages/generatedocumentresponse/recipientdocument/2014/09" xmlns:ser="http://schemas.microsoft.com/2003/10/Serialization/">
+	<xs:import schemaLocation="Serialization.xsd" namespace="http://schemas.microsoft.com/2003/10/Serialization/"/>
+	<xs:complexType name="ArrayOfGenerateDocumentResponse.RecipientDocument">
+		<xs:sequence>
+			<xs:element minOccurs="0" maxOccurs="unbounded" name="GenerateDocumentResponse.RecipientDocument" nillable="true" type="tns:GenerateDocumentResponse.RecipientDocument"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ArrayOfGenerateDocumentResponse.RecipientDocument" nillable="true" type="tns:ArrayOfGenerateDocumentResponse.RecipientDocument"/>
+	<xs:complexType name="GenerateDocumentResponse.RecipientDocument">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="Data" nillable="true" type="xs:base64Binary"/>
+			<xs:element minOccurs="0" name="RecipientId" type="ser:guid"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="GenerateDocumentResponse.RecipientDocument" nillable="true" type="tns:GenerateDocumentResponse.RecipientDocument"/>
+</xs:schema>

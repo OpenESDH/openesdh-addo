@@ -2,6 +2,7 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
+    <groupId>dk.openesdh.addo</groupId>
     <artifactId>addo-ws</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>addo-ws Visma Addo WebService</name>
@@ -10,11 +11,11 @@
         <groupId>dk.openesdh.addo</groupId>
         <artifactId>parent</artifactId>
         <version>1.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
-  
+    
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <cxf.version>2.2.9</cxf.version>
     </properties>
 
     <build>
@@ -22,28 +23,21 @@
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
-                <version>${cxf.version}</version>
+                <version>2.2.12</version>
                 <executions>
                     <execution>
                         <id>test-service</id>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <sourceRoot>${basedir}/target/generated-sources/xjc</sourceRoot>
+                            <sourceRoot>${basedir}/target/generated-sources/addo</sourceRoot>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <!--<wsdl>${basedir}/src/main/resources/test.wsdl</wsdl>-->
-                                    <!--<wsdl>${basedir}/src/main/resources/SigningService.svc.xml</wsdl>-->
-                                    <!--<wsdl>http://www.webservicex.net/stockquote.asmx?wsdl</wsdl>-->
-                                    <wsdl>http://wsf.cdyne.com/WeatherWS/Weather.asmx?wsdl</wsdl>
-                                    
-                                    
-                                    <serviceName>Weather</serviceName>
+                                    <wsdl>${basedir}/src/main/resources/wsdl2gen/SigningService.wsdl</wsdl>
+                                    <serviceName>AddoSigningService</serviceName>
                                     <extraargs>
-                                        <extraarg>-xjc-Xts</extraarg>
-                                        <extraarg>-p</extraarg>
-                                        <extraarg>net.vismaaddo</extraarg>
+                                        <!--<extraarg>-xjc-Xts</extraarg>-->
+                                        <!--<extraarg>-client</extraarg>-->
                                     </extraargs>
-                                    
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
@@ -58,11 +52,6 @@
                         <artifactId>xercesImpl</artifactId>
                         <version>2.9.1</version>
                     </dependency>
-                    <dependency>
-                        <groupId>org.apache.cxf</groupId>
-                        <artifactId>cxf-xjc-ts</artifactId>
-                        <version>${cxf.version}</version>
-                    </dependency>
                 </dependencies>
             </plugin>
         </plugins>
@@ -71,18 +60,17 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-tools-common</artifactId>
-            <version>${cxf.version}</version>
+            <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>3.0.7</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-simple</artifactId>
-            <version>${cxf.version}</version>
+            <artifactId>cxf-rt-ws-security</artifactId>
+            <version>3.0.7</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http</artifactId>
-            <version>${cxf.version}</version>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
         </dependency>
     </dependencies>
 

@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/Visma.Addo.WebService.Contracts.v1_0.Messages" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://schemas.datacontract.org/2004/07/Visma.Addo.WebService.Contracts.v1_0.Messages" xmlns:ser="http://schemas.microsoft.com/2003/10/Serialization/">
+	<xs:import schemaLocation="Serialization.xsd" namespace="http://schemas.microsoft.com/2003/10/Serialization/"/>
+	<xs:import schemaLocation="System.xsd" namespace="http://schemas.datacontract.org/2004/07/System"/>
+	<xs:complexType name="Signing">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="Documents" nillable="true" type="tns:ArrayOfSigning.Document"/>
+			<xs:element minOccurs="0" name="EnclosureDocuments" nillable="true" type="tns:ArrayOfSigning.Document"/>
+			<xs:element minOccurs="0" name="InboundEnclosures" nillable="true" type="tns:Signing.InboundEnclosuresCollection"/>
+			<xs:element minOccurs="0" name="Recipients" nillable="true" type="tns:ArrayOfSigning.RecipientData"/>
+			<xs:element minOccurs="0" name="SigningSequence" nillable="true" type="tns:Signing.SigningSequenceOrder"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Signing" nillable="true" type="tns:Signing"/>
+	<xs:complexType name="ArrayOfSigning.Document">
+		<xs:sequence>
+			<xs:element minOccurs="0" maxOccurs="unbounded" name="Signing.Document" nillable="true" type="tns:Signing.Document"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ArrayOfSigning.Document" nillable="true" type="tns:ArrayOfSigning.Document"/>
+	<xs:complexType name="Signing.Document">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="Data" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="Id" type="ser:guid"/>
+			<xs:element minOccurs="0" name="IsShared" type="xs:boolean"/>
+			<xs:element minOccurs="0" name="MimeType" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="Name" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="TemplateName" nillable="true" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Signing.Document" nillable="true" type="tns:Signing.Document"/>
+	<xs:complexType name="Signing.InboundEnclosuresCollection">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="AllowAll" type="xs:boolean"/>
+			<xs:element minOccurs="0" name="DocumentReferences" nillable="true" type="tns:ArrayOfSigning.DocumentInboundEnclosureReference"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Signing.InboundEnclosuresCollection" nillable="true" type="tns:Signing.InboundEnclosuresCollection"/>
+	<xs:complexType name="ArrayOfSigning.DocumentInboundEnclosureReference">
+		<xs:sequence>
+			<xs:element minOccurs="0" maxOccurs="unbounded" name="Signing.DocumentInboundEnclosureReference" nillable="true" type="tns:Signing.DocumentInboundEnclosureReference"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ArrayOfSigning.DocumentInboundEnclosureReference" nillable="true" type="tns:ArrayOfSigning.DocumentInboundEnclosureReference"/>
+	<xs:complexType name="Signing.DocumentInboundEnclosureReference">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="DocumentId" type="ser:guid"/>
+			<xs:element minOccurs="0" name="InboundEnclosuresComment" nillable="true" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Signing.DocumentInboundEnclosureReference" nillable="true" type="tns:Signing.DocumentInboundEnclosureReference"/>
+	<xs:complexType name="ArrayOfSigning.RecipientData">
+		<xs:sequence>
+			<xs:element minOccurs="0" maxOccurs="unbounded" name="Signing.RecipientData" nillable="true" type="tns:Signing.RecipientData"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ArrayOfSigning.RecipientData" nillable="true" type="tns:ArrayOfSigning.RecipientData"/>
+	<xs:complexType name="Signing.RecipientData">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="Address" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="Cpr" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="Email" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="Id" type="ser:guid"/>
+			<xs:element minOccurs="0" name="Name" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="Phone" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="SignedDate" nillable="true" type="q1:DateTimeOffset" xmlns:q1="http://schemas.datacontract.org/2004/07/System"/>
+			<xs:element minOccurs="0" name="TemplateData" nillable="true" type="tns:Signing.TemplateDataContainer"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Signing.RecipientData" nillable="true" type="tns:Signing.RecipientData"/>
+	<xs:complexType name="Signing.TemplateDataContainer">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="Items" nillable="true" type="tns:ArrayOfSigning.TemplateDataItem"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Signing.TemplateDataContainer" nillable="true" type="tns:Signing.TemplateDataContainer"/>
+	<xs:complexType name="ArrayOfSigning.TemplateDataItem">
+		<xs:sequence>
+			<xs:element minOccurs="0" maxOccurs="unbounded" name="Signing.TemplateDataItem" nillable="true" type="tns:Signing.TemplateDataItem"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ArrayOfSigning.TemplateDataItem" nillable="true" type="tns:ArrayOfSigning.TemplateDataItem"/>
+	<xs:complexType name="Signing.TemplateDataItem">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="Items" nillable="true" type="tns:ArrayOfSigning.TemplateDataItem"/>
+			<xs:element minOccurs="0" name="Name" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="Value" nillable="true" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Signing.TemplateDataItem" nillable="true" type="tns:Signing.TemplateDataItem"/>
+	<xs:complexType name="Signing.SigningSequenceOrder">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="SigningSequenceItems" nillable="true" type="tns:ArrayOfSigning.SigningSequenceItem"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Signing.SigningSequenceOrder" nillable="true" type="tns:Signing.SigningSequenceOrder"/>
+	<xs:complexType name="ArrayOfSigning.SigningSequenceItem">
+		<xs:sequence>
+			<xs:element minOccurs="0" maxOccurs="unbounded" name="Signing.SigningSequenceItem" nillable="true" type="tns:Signing.SigningSequenceItem"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ArrayOfSigning.SigningSequenceItem" nillable="true" type="tns:ArrayOfSigning.SigningSequenceItem"/>
+	<xs:complexType name="Signing.SigningSequenceItem">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="RecipientId" type="ser:guid"/>
+			<xs:element minOccurs="0" name="SequenceNumber" type="xs:int"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Signing.SigningSequenceItem" nillable="true" type="tns:Signing.SigningSequenceItem"/>
+	<xs:complexType name="TemplateOverride">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="CustomMessageTemplates" nillable="true" type="tns:ArrayOfTemplateOverride.MessageTemplate"/>
+			<xs:element minOccurs="0" name="DocumentEncryption" nillable="true" type="tns:DocumentEncryptionEnum"/>
+			<xs:element minOccurs="0" name="Duration" nillable="true" type="ser:duration"/>
+			<xs:element minOccurs="0" name="LastReminder" nillable="true" type="tns:LastReminderEnum"/>
+			<xs:element minOccurs="0" name="MessageType" nillable="true" type="tns:MessageTypeEnum"/>
+			<xs:element minOccurs="0" name="NotificationInterval" nillable="true" type="tns:NotificationIntervalEnum"/>
+			<xs:element minOccurs="0" name="SigningMethod" nillable="true" type="tns:SigningMethodEnum"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="TemplateOverride" nillable="true" type="tns:TemplateOverride"/>
+	<xs:complexType name="ArrayOfTemplateOverride.MessageTemplate">
+		<xs:sequence>
+			<xs:element minOccurs="0" maxOccurs="unbounded" name="TemplateOverride.MessageTemplate" nillable="true" type="tns:TemplateOverride.MessageTemplate"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ArrayOfTemplateOverride.MessageTemplate" nillable="true" type="tns:ArrayOfTemplateOverride.MessageTemplate"/>
+	<xs:complexType name="TemplateOverride.MessageTemplate">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="Body" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="DocumentType" type="tns:MessageTemplateType"/>
+			<xs:element minOccurs="0" name="Subject" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="UsageType" type="tns:TemplateUsageType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="TemplateOverride.MessageTemplate" nillable="true" type="tns:TemplateOverride.MessageTemplate"/>
+	<xs:simpleType name="MessageTemplateType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Sms">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Email">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="MessageTemplateType" nillable="true" type="tns:MessageTemplateType"/>
+	<xs:simpleType name="TemplateUsageType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="StartMessage"/>
+			<xs:enumeration value="RemindMessage"/>
+			<xs:enumeration value="Distribution">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">4</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="TemplateUsageType" nillable="true" type="tns:TemplateUsageType"/>
+	<xs:simpleType name="DocumentEncryptionEnum">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="None">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Encrypted">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="DocumentEncryptionEnum" nillable="true" type="tns:DocumentEncryptionEnum"/>
+	<xs:simpleType name="LastReminderEnum">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="DontSend">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DayBefore">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="TwoDaysBefore">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">3</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="LastReminderEnum" nillable="true" type="tns:LastReminderEnum"/>
+	<xs:simpleType name="MessageTypeEnum">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Mail">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Sms">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="MessageTypeEnum" nillable="true" type="tns:MessageTypeEnum"/>
+	<xs:simpleType name="NotificationIntervalEnum">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="DontSend">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EveryWeek">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EveryTwoWeeks">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">3</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EveryThreeWeeks">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">4</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="NotificationIntervalEnum" nillable="true" type="tns:NotificationIntervalEnum"/>
+	<xs:simpleType name="SigningMethodEnum">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="NemID">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Stylus">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="SigningMethodEnum" nillable="true" type="tns:SigningMethodEnum"/>
+	<xs:complexType name="ValidationData">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="ValidationErrors" nillable="true" type="tns:ArrayOfValidationError"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ValidationData" nillable="true" type="tns:ValidationData"/>
+	<xs:complexType name="ArrayOfValidationError">
+		<xs:sequence>
+			<xs:element minOccurs="0" maxOccurs="unbounded" name="ValidationError" nillable="true" type="tns:ValidationError"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ArrayOfValidationError" nillable="true" type="tns:ArrayOfValidationError"/>
+	<xs:complexType name="ValidationError">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="ErrorCode" type="tns:ValidationErrorCode"/>
+			<xs:element minOccurs="0" name="Message" nillable="true" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ValidationError" nillable="true" type="tns:ValidationError"/>
+	<xs:simpleType name="ValidationErrorCode">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="InvalidParameters">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="InvalidData">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="InvalidDocument">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">3</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="InvalidEnclosure">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">4</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="TemplateNotFound">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">5</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="InvalidTemplate">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">6</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NoDocumentsLeft">
+				<xs:annotation>
+					<xs:appinfo>
+						<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">7</EnumerationValue>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="ValidationErrorCode" nillable="true" type="tns:ValidationErrorCode"/>
+	<xs:complexType name="GetSigningTemplatesResponse">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="SigningTemplateItems" nillable="true" type="tns:ArrayOfSigningTemplate"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="GetSigningTemplatesResponse" nillable="true" type="tns:GetSigningTemplatesResponse"/>
+	<xs:complexType name="ArrayOfSigningTemplate">
+		<xs:sequence>
+			<xs:element minOccurs="0" maxOccurs="unbounded" name="SigningTemplate" nillable="true" type="tns:SigningTemplate"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ArrayOfSigningTemplate" nillable="true" type="tns:ArrayOfSigningTemplate"/>
+	<xs:complexType name="SigningTemplate">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="DocumentEncryption" type="tns:DocumentEncryptionEnum"/>
+			<xs:element minOccurs="0" name="Duration" type="ser:duration"/>
+			<xs:element minOccurs="0" name="FriendlyName" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="Id" type="ser:guid"/>
+			<xs:element minOccurs="0" name="LastReminder" type="tns:LastReminderEnum"/>
+			<xs:element minOccurs="0" name="MessageType" type="tns:MessageTypeEnum"/>
+			<xs:element minOccurs="0" name="NotificationInterval" type="tns:NotificationIntervalEnum"/>
+			<xs:element minOccurs="0" name="SigningMethod" type="tns:SigningMethodEnum"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="SigningTemplate" nillable="true" type="tns:SigningTemplate"/>
+</xs:schema>
