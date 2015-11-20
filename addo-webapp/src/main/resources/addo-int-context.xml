@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xmlns:p="http://www.springframework.org/schema/p"
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
@@ -22,9 +23,11 @@
     
     <context:component-scan base-package="dk.openesdh.addo.webapp" />
     
-    <bean id="mbeanServer" class="java.lang.management.ManagementFactory" 
-          lazy-init="false" factory-method="getPlatformMBeanServer"/>
-    
-    <context:mbean-export server="mbeanServer" />
+    <bean class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="rmiAddoService" />
+        <property name="service" ref="addoService" />
+        <property name="serviceInterface" value="dk.openesdh.addo.common.AddoService"/>
+        <property name="registryPort" value="10998" />
+    </bean>
 </beans>
 
