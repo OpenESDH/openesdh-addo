@@ -25,8 +25,8 @@ public class AddoServiceImpl implements AddoService {
 
     @Override
     @ManagedOperation
-    public String getSigningTemplates(String username, String password) {
-        return webService.getSigningTemplates(username, password);
+    public String getSigningTemplates(String guid) {
+        return webService.getSigningTemplates(guid);
     }
 
 }

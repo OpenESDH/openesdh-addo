@@ -30,8 +30,10 @@ public class AddoWebService {
     public SigningService getPort(String username, String password) {
         SigningService port = service.getSigningService();
         ((BindingProvider) port).getRequestContext().put("ws-security.sts.client", sts);
-        ((BindingProvider) port).getRequestContext().put("ws-security.username", username);
-        ((BindingProvider) port).getRequestContext().put("ws-security.password", password);
+        if (username != null) {
+            ((BindingProvider) port).getRequestContext().put("ws-security.username", username);
+            ((BindingProvider) port).getRequestContext().put("ws-security.password", password);
+        }
         return port;
     }
 
@@ -43,10 +45,10 @@ public class AddoWebService {
         return login(getPort(username, password), username, password);
     }
 
-    public String getSigningTemplates(String username, String password) {
-        SigningService port = getPort(username, password);
-        String loginToken = login(port, username, password);
-        GetSigningTemplatesResponse signingTemplates = port.getSigningTemplates(loginToken);
+    public String getSigningTemplates(String guid) {
+        SigningService port = getPort(null, null);
+//        String loginToken = login(port, username, password);
+        GetSigningTemplatesResponse signingTemplates = port.getSigningTemplates(guid);
         return jaxbToJsonString(signingTemplates.getSigningTemplateItems(), ArrayOfSigningTemplate.class);
     }
 
