@@ -1,4 +1,4 @@
-package dk.openesdh.addo.common;
+package dk.openesdh.addo.model;
 
 import java.io.Serializable;
 

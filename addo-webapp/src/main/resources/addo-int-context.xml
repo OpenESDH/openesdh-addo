@@ -21,13 +21,13 @@
         </property>
     </bean>
     
-    <context:component-scan base-package="dk.openesdh.addo.webapp" />
+    <context:component-scan base-package="dk.openesdh.addo.services" />
     
     <bean class="org.springframework.remoting.rmi.RmiServiceExporter">
         <property name="serviceName" value="rmiAddoService" />
         <property name="service" ref="addoService" />
-        <property name="serviceInterface" value="dk.openesdh.addo.common.AddoService"/>
-        <property name="registryPort" value="10998" />
+        <property name="serviceInterface" value="dk.openesdh.addo.services.AddoService"/>
+        <property name="registryPort" value="10901" />
     </bean>
 </beans>
 

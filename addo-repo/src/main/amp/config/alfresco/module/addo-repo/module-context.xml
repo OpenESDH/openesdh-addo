@@ -8,10 +8,10 @@
 
     
     <bean id="addoService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
-        <property name="serviceUrl" value="rmi://localhost:10998/rmiAddoService"/>
-        <property name="serviceInterface" value="dk.openesdh.addo.common.AddoService"/>
+        <property name="serviceUrl" value="rmi://localhost:10901/rmiAddoService"/>
+        <property name="serviceInterface" value="dk.openesdh.addo.services.AddoService"/>
     </bean>
     
     <context:annotation-config/>
-    <context:component-scan base-package="dk.openesdh.addo.services, dk.openesdh.addo.webscipts" />
+    <context:component-scan base-package="dk.openesdh.addo.webscipts" />
 </beans>
