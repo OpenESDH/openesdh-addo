@@ -7,7 +7,7 @@ public class AddoException extends RuntimeException implements Serializable {
     private static final long serialVersionUID = -1;
 
     public AddoException(Throwable e) {
-        super(e.getMessage());
+        super(e.getClass().getSimpleName() + ": " + e.getMessage());
         this.setStackTrace(e.getStackTrace());
     }
 }

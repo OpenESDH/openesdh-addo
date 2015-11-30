@@ -6,10 +6,10 @@ import com.github.dynamicextensionsalfresco.webscripts.annotations.Uri;
 import com.github.dynamicextensionsalfresco.webscripts.annotations.UriVariable;
 import com.github.dynamicextensionsalfresco.webscripts.annotations.WebScript;
 import com.github.dynamicextensionsalfresco.webscripts.resolutions.Resolution;
+import dk.openesdh.addo.exception.AddoException;
 import dk.openesdh.addo.model.AddoDocument;
 import dk.openesdh.addo.model.AddoRecipient;
 import dk.openesdh.addo.services.AddoService;
-import dk.openesdh.addo.exception.AddoException;
 import dk.openesdh.repo.model.OpenESDHModel;
 import dk.openesdh.repo.webscripts.ParamUtils;
 import dk.openesdh.repo.webscripts.contacts.ContactUtils;
@@ -30,6 +30,7 @@ import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,6 +46,7 @@ import org.springframework.util.FileCopyUtils;
 @WebScript(description = "Send Document To Visma Addo", families = {"Addo"})
 public class DocumcentToAddoWebScript {
 
+    private static final Logger LOG = Logger.getLogger(DocumcentToAddoWebScript.class);
     private static final String LOGIN_ERROR = "At least one security token in the message could not be validated.";
     private static final QName PROP_ADDO_PASSWORD = QName.createQName(ContentModel.USER_MODEL_URI, "addoPassword");
 
@@ -80,11 +82,10 @@ public class DocumcentToAddoWebScript {
         ParamUtils.checkRequiredParam(addoPassword, "addoPassword");
         String password = encodePw(addoPassword);
         try {
-            if (service.tryLogin(userEmail, password)) {
-                nodeService.setProperty(user, PROP_ADDO_PASSWORD, password);
-            }
+            service.tryLogin(userEmail, password);
+            nodeService.setProperty(user, PROP_ADDO_PASSWORD, password);
         } catch (AddoException e) {
-            if (LOGIN_ERROR.equals(e.getMessage())) {
+            if (e.getMessage().contains(LOGIN_ERROR)) {
                 throw new WebScriptException("ADDO.USER.INCORECT_PASSWORD");
             }
             throw e;
@@ -133,6 +134,7 @@ public class DocumcentToAddoWebScript {
                 reqJSON.getBoolean("sequential")
         );
         //TODO: save addoSigningToken for future use
+        LOG.info("Addo initiane signing result: " + addoSigningToken);
         return WebScriptUtils.jsonResolution(addoSigningToken);
     }
 
