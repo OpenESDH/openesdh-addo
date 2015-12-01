@@ -62,9 +62,13 @@ public class DocumcentToAddoWebScript {
     @Autowired
     private ContentService contentService;
 
-    private String[] getUserNameAndPassword() {
+    private NodeRef getCurrentUserNodeRef() {
         String username = authenticationService.getCurrentUserName();
-        NodeRef user = authorityService.getAuthorityNodeRef(username);
+        return authorityService.getAuthorityNodeRef(username);
+    }
+
+    private String[] getUserNameAndPassword() {
+        NodeRef user = getCurrentUserNodeRef();
         //email as user in addo
         String email = (String) nodeService.getProperty(user, ContentModel.PROP_EMAIL);
         //saved encoded user password for addo
@@ -97,6 +101,13 @@ public class DocumcentToAddoWebScript {
     public Resolution getSigningTemplates(WebScriptRequest req) throws JSONException {
         String[] user = getUserNameAndPassword();
         return WebScriptUtils.jsonResolution(new JSONObject(service.getSigningTemplates(user[0], user[1])));
+    }
+
+    @Uri(value = "/api/vismaaddo/isConfigured", method = HttpMethod.GET, defaultFormat = "json")
+    public Resolution isAddoAccountConfigured(WebScriptRequest req) throws JSONException {
+        NodeRef user = getCurrentUserNodeRef();
+        boolean hasAddo = nodeService.getProperty(user, PROP_ADDO_PASSWORD) != null;
+        return WebScriptUtils.jsonResolution(new JSONObject().put("configured", hasAddo));
     }
 
     @Uri(value = "/api/vismaaddo/InitiateSigning",
