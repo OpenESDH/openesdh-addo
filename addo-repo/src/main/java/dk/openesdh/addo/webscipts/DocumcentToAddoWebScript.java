@@ -48,6 +48,7 @@ public class DocumcentToAddoWebScript {
 
     private static final Logger LOG = Logger.getLogger(DocumcentToAddoWebScript.class);
     private static final String LOGIN_ERROR = "At least one security token in the message could not be validated.";
+    private static final QName PROP_ADDO_USERNAME = QName.createQName(ContentModel.USER_MODEL_URI, "addoUsername");
     private static final QName PROP_ADDO_PASSWORD = QName.createQName(ContentModel.USER_MODEL_URI, "addoPassword");
 
     @Autowired
@@ -78,15 +79,15 @@ public class DocumcentToAddoWebScript {
 
     @Uri(value = "/api/openesdh/addo/{username}/save", method = HttpMethod.POST, defaultFormat = "json")
     public void saveUserProperties(
-            WebScriptRequest req,
             @UriVariable final String username,
+            @RequestParam(required = true) final String addoUsername,
             @RequestParam(required = true) final String addoPassword) {
         NodeRef user = authorityService.getAuthorityNodeRef(username);
-        String userEmail = (String) nodeService.getProperty(user, ContentModel.PROP_EMAIL);
         ParamUtils.checkRequiredParam(addoPassword, "addoPassword");
         String password = encodePw(addoPassword);
         try {
-            service.tryLogin(userEmail, password);
+            service.tryLogin(addoUsername, password);
+            nodeService.setProperty(user, PROP_ADDO_USERNAME, addoUsername);
             nodeService.setProperty(user, PROP_ADDO_PASSWORD, password);
         } catch (AddoException e) {
             if (e.getMessage().contains(LOGIN_ERROR)) {
@@ -94,7 +95,6 @@ public class DocumcentToAddoWebScript {
             }
             throw e;
         }
-
     }
 
     @Uri(value = "/api/vismaaddo/SigningTemplates", method = HttpMethod.GET, defaultFormat = "json")
@@ -103,11 +103,18 @@ public class DocumcentToAddoWebScript {
         return WebScriptUtils.jsonResolution(new JSONObject(service.getSigningTemplates(user[0], user[1])));
     }
 
-    @Uri(value = "/api/vismaaddo/isConfigured", method = HttpMethod.GET, defaultFormat = "json")
-    public Resolution isAddoAccountConfigured(WebScriptRequest req) throws JSONException {
-        NodeRef user = getCurrentUserNodeRef();
-        boolean hasAddo = nodeService.getProperty(user, PROP_ADDO_PASSWORD) != null;
-        return WebScriptUtils.jsonResolution(new JSONObject().put("configured", hasAddo));
+    @Uri(value = "/api/openesdh/addo/{username}/props", method = HttpMethod.GET, defaultFormat = "json")
+    public Resolution getAddoUserProperties(@UriVariable final String username) throws JSONException {
+        NodeRef user = authorityService.getAuthorityNodeRef(username);
+        JSONObject addoJSON = new JSONObject()
+                .put(PROP_ADDO_USERNAME.getLocalName(), nodeService.getProperty(user, PROP_ADDO_USERNAME))
+                .put("configured", nodeService.getProperty(user, PROP_ADDO_PASSWORD) != null);//not returning password
+        return WebScriptUtils.jsonResolution(addoJSON);
+    }
+
+    @Uri(value = "/api/openesdh/addo/props", method = HttpMethod.GET, defaultFormat = "json")
+    public Resolution getAddoCurrentUserProperties() throws JSONException {
+        return getAddoUserProperties(authenticationService.getCurrentUserName());
     }
 
     @Uri(value = "/api/vismaaddo/InitiateSigning",
