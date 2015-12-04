@@ -11,6 +11,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.soap.MTOMFeature;
+import javax.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
@@ -22,6 +23,8 @@ import org.json.XML;
 import org.tempuri.AddoSigningService;
 
 public class AddoWebService {
+
+    public static final String LOGIN_ERROR = "At least one security token in the message could not be validated.";
 
     public void init() throws MalformedURLException, IOException {
     }
@@ -46,7 +49,16 @@ public class AddoWebService {
     }
 
     public Boolean tryLogin(String username, String password) {
-        return getPort(username, password).tryLogin();
+        SigningService port = getPort(username, password);
+        try {
+            port.tryLogin();
+            return true;
+        } catch (SOAPFaultException e) {
+            if (e.getMessage().equals(LOGIN_ERROR)) {
+                return false;
+            }
+            throw e;
+        }
     }
 
     public String jaxbToJsonString(JAXBElement jaxb) {

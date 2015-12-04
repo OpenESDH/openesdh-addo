@@ -1,19 +1,13 @@
 package dk.openesdh.addo.webscipts;
 
 import com.github.dynamicextensionsalfresco.webscripts.annotations.HttpMethod;
-import com.github.dynamicextensionsalfresco.webscripts.annotations.RequestParam;
 import com.github.dynamicextensionsalfresco.webscripts.annotations.Uri;
-import com.github.dynamicextensionsalfresco.webscripts.annotations.UriVariable;
 import com.github.dynamicextensionsalfresco.webscripts.annotations.WebScript;
 import com.github.dynamicextensionsalfresco.webscripts.resolutions.Resolution;
 import dk.openesdh.addo.model.AddoDocument;
-import dk.openesdh.addo.model.AddoDocumentStatus;
-import dk.openesdh.addo.model.AddoPasswordEncoder;
 import dk.openesdh.addo.model.AddoRecipient;
-import dk.openesdh.addo.services.AddoService;
 import dk.openesdh.repo.model.OpenESDHModel;
 import dk.openesdh.repo.services.cases.CaseService;
-import dk.openesdh.repo.webscripts.ParamUtils;
 import dk.openesdh.repo.webscripts.contacts.ContactUtils;
 import dk.openesdh.repo.webscripts.utils.WebScriptUtils;
 import java.io.ByteArrayOutputStream;
@@ -26,16 +20,12 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.security.AuthenticationService;
-import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.namespace.QName;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.WebScriptException;
 import org.springframework.extensions.webscripts.WebScriptRequest;
@@ -44,77 +34,16 @@ import org.springframework.util.FileCopyUtils;
 
 @Component
 @WebScript(description = "Send Document To Visma Addo", families = {"Addo"})
-public class DocumcentToAddoWebScript {
+public class AddoInitiateSigningWebScript extends AbstractAddoWebscript {
 
-    private static final Logger LOG = Logger.getLogger(DocumcentToAddoWebScript.class);
-    private static final QName PROP_ADDO_USERNAME = QName.createQName(ContentModel.USER_MODEL_URI, "addoUsername");
-    private static final QName PROP_ADDO_PASSWORD = QName.createQName(ContentModel.USER_MODEL_URI, "addoPassword");
-    private static final QName PROP_CASE_ADDO_ID = QName.createQName(ContentModel.USER_MODEL_URI, "addoCaseId");
+    private static final Logger LOG = Logger.getLogger(AddoInitiateSigningWebScript.class);
 
-    @Autowired
-    @Qualifier("addoService")
-    private AddoService service;
-    @Autowired
-    private AuthenticationService authenticationService;
-    @Autowired
-    private AuthorityService authorityService;
-    @Autowired
-    private NodeService nodeService;
     @Autowired
     private ContentService contentService;
     @Autowired
     private CaseService caseService;
 
-    private NodeRef getCurrentUserNodeRef() {
-        String username = authenticationService.getCurrentUserName();
-        return authorityService.getAuthorityNodeRef(username);
-    }
-
-    private String[] getUserNameAndPassword() {
-        NodeRef user = getCurrentUserNodeRef();
-        //email as user in addo
-        String email = (String) nodeService.getProperty(user, ContentModel.PROP_EMAIL);
-        //saved encoded user password for addo
-        String pw = (String) nodeService.getProperty(user, PROP_ADDO_PASSWORD);
-        return new String[]{email, pw};
-    }
-
-    @Uri(value = "/api/openesdh/addo/{username}/save", method = HttpMethod.POST, defaultFormat = "json")
-    public void saveUserProperties(
-            @UriVariable final String username,
-            @RequestParam(required = true) final String addoUsername,
-            @RequestParam(required = true) final String addoPassword) {
-        NodeRef user = authorityService.getAuthorityNodeRef(username);
-        ParamUtils.checkRequiredParam(addoPassword, "addoPassword");
-        String password = AddoPasswordEncoder.encode(addoPassword);
-        if (!service.tryLogin(addoUsername, password)) {
-            throw new WebScriptException("ADDO.USER.INCORECT_PASSWORD");
-        }
-        nodeService.setProperty(user, PROP_ADDO_USERNAME, addoUsername);
-        nodeService.setProperty(user, PROP_ADDO_PASSWORD, password);
-    }
-
-    @Uri(value = "/api/vismaaddo/SigningTemplates", method = HttpMethod.GET, defaultFormat = "json")
-    public Resolution getSigningTemplates(WebScriptRequest req) throws JSONException {
-        String[] user = getUserNameAndPassword();
-        return WebScriptUtils.jsonResolution(new JSONObject(service.getSigningTemplates(user[0], user[1])));
-    }
-
-    @Uri(value = "/api/openesdh/addo/{username}/props", method = HttpMethod.GET, defaultFormat = "json")
-    public Resolution getAddoUserProperties(@UriVariable final String username) throws JSONException {
-        NodeRef user = authorityService.getAuthorityNodeRef(username);
-        JSONObject addoJSON = new JSONObject()
-                .put(PROP_ADDO_USERNAME.getLocalName(), nodeService.getProperty(user, PROP_ADDO_USERNAME))
-                .put("configured", nodeService.getProperty(user, PROP_ADDO_PASSWORD) != null);//not returning password
-        return WebScriptUtils.jsonResolution(addoJSON);
-    }
-
-    @Uri(value = "/api/openesdh/addo/props", method = HttpMethod.GET, defaultFormat = "json")
-    public Resolution getAddoCurrentUserProperties() throws JSONException {
-        return getAddoUserProperties(authenticationService.getCurrentUserName());
-    }
-
-    @Uri(value = "/api/vismaaddo/InitiateSigning",
+    @Uri(value = "/api/openesdh/addo/InitiateSigning",
             method = HttpMethod.POST, defaultFormat = "json")
     public Resolution initiateSigning(WebScriptRequest req) throws JSONException, IOException {
         JSONObject reqJSON = new JSONObject(req.getContent().getContent());
@@ -153,17 +82,6 @@ public class DocumcentToAddoWebScript {
         NodeRef caseNodeRef = caseService.getCaseById(caseId);
         nodeService.setProperty(caseNodeRef, PROP_CASE_ADDO_ID, addoSigningToken);
         return WebScriptUtils.jsonResolution(addoSigningToken);
-    }
-
-    @Uri(value = "/api/vismaaddo/getSigningStatus/{caseId}", method = HttpMethod.GET, defaultFormat = "json")
-    public Resolution getSigningStatus(@UriVariable final String caseId) throws JSONException, IOException {
-        String[] userCred = getUserNameAndPassword();
-        NodeRef caseNodeRef = caseService.getCaseById(caseId);
-        String signingTokenId = (String) nodeService.getProperty(caseNodeRef, PROP_CASE_ADDO_ID);
-        JSONObject signingStatusJSON = new JSONObject(service.getSigningStatus(userCred[0], userCred[1], signingTokenId))
-                .getJSONObject("GetSigningSatus");
-        signingStatusJSON.put("state", AddoDocumentStatus.of(signingStatusJSON.getInt("StateID")));
-        return WebScriptUtils.jsonResolution(signingStatusJSON);
     }
 
     private AddoDocument getDocument(String documentNodeRefId) {

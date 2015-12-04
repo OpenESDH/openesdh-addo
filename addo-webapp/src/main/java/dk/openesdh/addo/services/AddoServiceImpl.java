@@ -12,7 +12,6 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import javax.xml.ws.soap.SOAPFaultException;
 import org.datacontract.schemas._2004._07.visma_addo_webservice_contracts_v1_0.ArrayOfSigningDocument;
 import org.datacontract.schemas._2004._07.visma_addo_webservice_contracts_v1_0.ArrayOfSigningRecipientData;
 import org.datacontract.schemas._2004._07.visma_addo_webservice_contracts_v1_0.ArrayOfSigningSigningSequenceItem;
@@ -37,15 +36,7 @@ public class AddoServiceImpl implements AddoService {
 
     @Override
     public Boolean tryLogin(String username, String password) {
-        try {
-            webService.tryLogin(username, password);
-            return true;
-        } catch (SOAPFaultException e) {
-            if (e.getMessage().equals(LOGIN_ERROR)) {
-                return false;
-            }
-            throw e;
-        }
+        return webService.tryLogin(username, password);
     }
 
     @Override
