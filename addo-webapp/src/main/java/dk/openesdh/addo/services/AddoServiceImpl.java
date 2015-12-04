@@ -1,20 +1,21 @@
 package dk.openesdh.addo.services;
 
+import dk.openesdh.addo.exception.AddoException;
 import dk.openesdh.addo.model.AddoDocument;
 import dk.openesdh.addo.model.AddoRecipient;
-import dk.openesdh.addo.exception.AddoException;
 import dk.openesdh.addo.webservices.AddoWebService;
 import dk.vismaaddo.schemas.services.signingservice._2014._09.SigningService;
+import dk.vismaaddo.schemas.services.signingservice.messages.generatedocumentrequest._2014._09.GetSigningSatus;
 import dk.vismaaddo.schemas.services.signingservice.messages.initiatesigningrequest._2014._09.InitiateSigningRequest;
 import dk.vismaaddo.schemas.services.signingservice.messages.initiatesigningresponse._2014._09.InitiateSigningResponse;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import javax.xml.ws.soap.SOAPFaultException;
 import org.datacontract.schemas._2004._07.visma_addo_webservice_contracts_v1_0.ArrayOfSigningDocument;
 import org.datacontract.schemas._2004._07.visma_addo_webservice_contracts_v1_0.ArrayOfSigningRecipientData;
 import org.datacontract.schemas._2004._07.visma_addo_webservice_contracts_v1_0.ArrayOfSigningSigningSequenceItem;
-import org.datacontract.schemas._2004._07.visma_addo_webservice_contracts_v1_0.ArrayOfSigningTemplate;
 import org.datacontract.schemas._2004._07.visma_addo_webservice_contracts_v1_0.ArrayOfValidationError;
 import org.datacontract.schemas._2004._07.visma_addo_webservice_contracts_v1_0.GetSigningTemplatesResponse;
 import org.datacontract.schemas._2004._07.visma_addo_webservice_contracts_v1_0.Signing;
@@ -36,7 +37,15 @@ public class AddoServiceImpl implements AddoService {
 
     @Override
     public Boolean tryLogin(String username, String password) {
-        return webService.tryLogin(username, password);
+        try {
+            webService.tryLogin(username, password);
+            return true;
+        } catch (SOAPFaultException e) {
+            if (e.getMessage().equals(LOGIN_ERROR)) {
+                return false;
+            }
+            throw e;
+        }
     }
 
     @Override
@@ -44,7 +53,7 @@ public class AddoServiceImpl implements AddoService {
         SigningService port = webService.getPort(username, password);
         String token = port.login(username, password);
         GetSigningTemplatesResponse signingTemplates = port.getSigningTemplates(token);
-        return webService.jaxbToJsonString(signingTemplates.getSigningTemplateItems(), ArrayOfSigningTemplate.class);
+        return webService.jaxbToJsonString(signingTemplates.getSigningTemplateItems());
     }
 
     @Override
@@ -65,9 +74,6 @@ public class AddoServiceImpl implements AddoService {
 
         org.datacontract.schemas._2004._07.visma_addo_webservice_contracts_v1_0.ObjectFactory signingFactory
                 = new org.datacontract.schemas._2004._07.visma_addo_webservice_contracts_v1_0.ObjectFactory();
-
-        com.microsoft.schemas._2003._10.serialization.ObjectFactory msFactory
-                = new com.microsoft.schemas._2003._10.serialization.ObjectFactory();
 
         /**
          * Documents
@@ -189,5 +195,17 @@ public class AddoServiceImpl implements AddoService {
         throw new RuntimeException("Signing token is missing");
     }
 
+    @Override
+    public String getSigningStatus(String username, String password, String signingToken) {
+        SigningService port = webService.getPort(username, password);
+        String guid = port.login(username, password);
+        GetSigningSatus signingStatus = port.getSigningStatus(guid, signingToken);
+        dk.vismaaddo.schemas.services.signingservice.messages.generatedocumentrequest._2014._09.ObjectFactory f
+                = new dk.vismaaddo.schemas.services.signingservice.messages.generatedocumentrequest._2014._09.ObjectFactory();
+        return webService.jaxbToJsonString(f.createGetSigningSatus(signingStatus));
+    }
 
+    void setWebService4testing(AddoWebService webService) {
+        this.webService = webService;
+    }
 }

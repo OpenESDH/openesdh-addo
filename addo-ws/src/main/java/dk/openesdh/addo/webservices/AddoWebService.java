@@ -49,11 +49,11 @@ public class AddoWebService {
         return getPort(username, password).tryLogin();
     }
 
-    public String jaxbToJsonString(JAXBElement jaxb, Class clazz) {
+    public String jaxbToJsonString(JAXBElement jaxb) {
         try {
-            JAXBContext jc = JAXBContext.newInstance(clazz);
+            JAXBContext jc = JAXBContext.newInstance(jaxb.getValue().getClass());
             Marshaller marshaller = jc.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             marshaller.marshal(jaxb, out);
             return XML.toJSONObject(out.toString()).toString();

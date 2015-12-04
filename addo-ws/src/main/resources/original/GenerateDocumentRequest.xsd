@@ -66,10 +66,35 @@
 	<xs:element name="GetSigningResponse.SigningDocument" nillable="true" type="tns:GetSigningResponse.SigningDocument"/>
 	<xs:complexType name="GetSigningSatus">
 		<xs:sequence>
-			<xs:element minOccurs="0" name="Name" nillable="true" type="xs:string"/>
+      <xs:element minOccurs="0" name="Recipients" nillable="true" type="tns:ArrayOfGetSigningSatus.Recipient"/>
 			<xs:element minOccurs="0" name="SigningToken" nillable="true" type="xs:string"/>
-			<xs:element minOccurs="0" name="TransactionToken" type="ser:guid"/>
+      <xs:element minOccurs="0" name="StateID" type="xs:int"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:element name="GetSigningSatus" nillable="true" type="tns:GetSigningSatus"/>
+  <xs:complexType name="ArrayOfGetSigningSatus.Recipient">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="GetSigningSatus.Recipient" nillable="true" type="tns:GetSigningSatus.Recipient"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfGetSigningSatus.Recipient" nillable="true" type="tns:ArrayOfGetSigningSatus.Recipient"/>
+  <xs:complexType name="GetSigningSatus.Recipient">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string"/>
+      <xs:element minOccurs="0" name="Transactions" nillable="true" type="tns:ArrayOfGetSigningSatus.Transaction"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GetSigningSatus.Recipient" nillable="true" type="tns:GetSigningSatus.Recipient"/>
+  <xs:complexType name="ArrayOfGetSigningSatus.Transaction">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="GetSigningSatus.Transaction" nillable="true" type="tns:GetSigningSatus.Transaction"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfGetSigningSatus.Transaction" nillable="true" type="tns:ArrayOfGetSigningSatus.Transaction"/>
+  <xs:complexType name="GetSigningSatus.Transaction">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="TransactionToken" type="ser:guid"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GetSigningSatus.Transaction" nillable="true" type="tns:GetSigningSatus.Transaction"/>
 </xs:schema>

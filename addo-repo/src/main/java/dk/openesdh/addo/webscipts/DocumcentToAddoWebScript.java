@@ -6,11 +6,13 @@ import com.github.dynamicextensionsalfresco.webscripts.annotations.Uri;
 import com.github.dynamicextensionsalfresco.webscripts.annotations.UriVariable;
 import com.github.dynamicextensionsalfresco.webscripts.annotations.WebScript;
 import com.github.dynamicextensionsalfresco.webscripts.resolutions.Resolution;
-import dk.openesdh.addo.exception.AddoException;
 import dk.openesdh.addo.model.AddoDocument;
+import dk.openesdh.addo.model.AddoDocumentStatus;
+import dk.openesdh.addo.model.AddoPasswordEncoder;
 import dk.openesdh.addo.model.AddoRecipient;
 import dk.openesdh.addo.services.AddoService;
 import dk.openesdh.repo.model.OpenESDHModel;
+import dk.openesdh.repo.services.cases.CaseService;
 import dk.openesdh.repo.webscripts.ParamUtils;
 import dk.openesdh.repo.webscripts.contacts.ContactUtils;
 import dk.openesdh.repo.webscripts.utils.WebScriptUtils;
@@ -28,8 +30,6 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.namespace.QName;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,9 +47,9 @@ import org.springframework.util.FileCopyUtils;
 public class DocumcentToAddoWebScript {
 
     private static final Logger LOG = Logger.getLogger(DocumcentToAddoWebScript.class);
-    private static final String LOGIN_ERROR = "At least one security token in the message could not be validated.";
     private static final QName PROP_ADDO_USERNAME = QName.createQName(ContentModel.USER_MODEL_URI, "addoUsername");
     private static final QName PROP_ADDO_PASSWORD = QName.createQName(ContentModel.USER_MODEL_URI, "addoPassword");
+    private static final QName PROP_CASE_ADDO_ID = QName.createQName(ContentModel.USER_MODEL_URI, "addoCaseId");
 
     @Autowired
     @Qualifier("addoService")
@@ -62,6 +62,8 @@ public class DocumcentToAddoWebScript {
     private NodeService nodeService;
     @Autowired
     private ContentService contentService;
+    @Autowired
+    private CaseService caseService;
 
     private NodeRef getCurrentUserNodeRef() {
         String username = authenticationService.getCurrentUserName();
@@ -84,17 +86,12 @@ public class DocumcentToAddoWebScript {
             @RequestParam(required = true) final String addoPassword) {
         NodeRef user = authorityService.getAuthorityNodeRef(username);
         ParamUtils.checkRequiredParam(addoPassword, "addoPassword");
-        String password = encodePw(addoPassword);
-        try {
-            service.tryLogin(addoUsername, password);
-            nodeService.setProperty(user, PROP_ADDO_USERNAME, addoUsername);
-            nodeService.setProperty(user, PROP_ADDO_PASSWORD, password);
-        } catch (AddoException e) {
-            if (e.getMessage().contains(LOGIN_ERROR)) {
-                throw new WebScriptException("ADDO.USER.INCORECT_PASSWORD");
-            }
-            throw e;
+        String password = AddoPasswordEncoder.encode(addoPassword);
+        if (!service.tryLogin(addoUsername, password)) {
+            throw new WebScriptException("ADDO.USER.INCORECT_PASSWORD");
         }
+        nodeService.setProperty(user, PROP_ADDO_USERNAME, addoUsername);
+        nodeService.setProperty(user, PROP_ADDO_PASSWORD, password);
     }
 
     @Uri(value = "/api/vismaaddo/SigningTemplates", method = HttpMethod.GET, defaultFormat = "json")
@@ -124,6 +121,7 @@ public class DocumcentToAddoWebScript {
         JSONArray documentsJSON = reqJSON.getJSONArray("documents");
         JSONArray receiversJSON = reqJSON.getJSONArray("receivers");
         JSONObject templateJSON = reqJSON.getJSONObject("template");
+        String caseId = reqJSON.getString("caseId");
 
         List<AddoDocument> documents = new ArrayList<>();
         List<AddoDocument> enclosureDocuments = new ArrayList<>();
@@ -151,9 +149,21 @@ public class DocumcentToAddoWebScript {
                 receivers,
                 reqJSON.getBoolean("sequential")
         );
-        //TODO: save addoSigningToken for future use
         LOG.info("Addo initiane signing result: " + addoSigningToken);
+        NodeRef caseNodeRef = caseService.getCaseById(caseId);
+        nodeService.setProperty(caseNodeRef, PROP_CASE_ADDO_ID, addoSigningToken);
         return WebScriptUtils.jsonResolution(addoSigningToken);
+    }
+
+    @Uri(value = "/api/vismaaddo/getSigningStatus/{caseId}", method = HttpMethod.GET, defaultFormat = "json")
+    public Resolution getSigningStatus(@UriVariable final String caseId) throws JSONException, IOException {
+        String[] userCred = getUserNameAndPassword();
+        NodeRef caseNodeRef = caseService.getCaseById(caseId);
+        String signingTokenId = (String) nodeService.getProperty(caseNodeRef, PROP_CASE_ADDO_ID);
+        JSONObject signingStatusJSON = new JSONObject(service.getSigningStatus(userCred[0], userCred[1], signingTokenId))
+                .getJSONObject("GetSigningSatus");
+        signingStatusJSON.put("state", AddoDocumentStatus.of(signingStatusJSON.getInt("StateID")));
+        return WebScriptUtils.jsonResolution(signingStatusJSON);
     }
 
     private AddoDocument getDocument(String documentNodeRefId) {
@@ -191,9 +201,5 @@ public class DocumcentToAddoWebScript {
                 ContactUtils.getAddress(props),
                 recipient.getString("displayName"),
                 (String) props.get(OpenESDHModel.PROP_CONTACT_PHONE));
-    }
-
-    public static String encodePw(String pw) {
-        return Base64.encodeBase64String(DigestUtils.sha512(pw));
     }
 }
