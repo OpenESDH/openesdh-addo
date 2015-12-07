@@ -75,7 +75,7 @@ public class AddoWebService {
     }
 
     public void throwError(ValidationError err) {
-        throw new RuntimeException(err.getErrorCode() + ": " + err.getMessage());
+        throw new RuntimeException(err.getErrorCode() + ": " + err.getMessage().getValue());
     }
 
     public XMLGregorianCalendar gregorianCalendarOf(Date date) {

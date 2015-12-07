@@ -8,29 +8,27 @@ import dk.openesdh.addo.model.AddoDocument;
 import dk.openesdh.addo.model.AddoRecipient;
 import dk.openesdh.repo.model.OpenESDHModel;
 import dk.openesdh.repo.services.cases.CaseService;
+import dk.openesdh.repo.services.documents.DocumentPDFService;
 import dk.openesdh.repo.webscripts.contacts.ContactUtils;
 import dk.openesdh.repo.webscripts.utils.WebScriptUtils;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.alfresco.model.ContentModel;
-import org.alfresco.service.cmr.repository.ContentReader;
-import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.WebScriptException;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.stereotype.Component;
-import org.springframework.util.FileCopyUtils;
 
 @Component
 @WebScript(description = "Send Document To Visma Addo", families = {"Addo"})
@@ -39,9 +37,9 @@ public class AddoInitiateSigningWebScript extends AbstractAddoWebscript {
     private static final Logger LOG = Logger.getLogger(AddoInitiateSigningWebScript.class);
 
     @Autowired
-    private ContentService contentService;
-    @Autowired
     private CaseService caseService;
+    @Autowired
+    private DocumentPDFService documentPDFService;
 
     @Uri(value = "/api/openesdh/addo/InitiateSigning",
             method = HttpMethod.POST, defaultFormat = "json")
@@ -84,21 +82,12 @@ public class AddoInitiateSigningWebScript extends AbstractAddoWebscript {
         return WebScriptUtils.jsonResolution(addoSigningToken);
     }
 
-    private AddoDocument getDocument(String documentNodeRefId) {
+    private AddoDocument getDocument(String documentNodeRefId) throws IOException {
         NodeRef documentNodeRef = new NodeRef(documentNodeRefId);
         String title = (String) nodeService.getProperty(documentNodeRef, ContentModel.PROP_TITLE);
-        ContentReader reader = contentService.getReader(documentNodeRef, ContentModel.PROP_CONTENT);
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        byte[] fileBytes = null;
-        try {
-            FileCopyUtils.copy(reader.getContentInputStream(), os);
-            fileBytes = os.toByteArray();
-        } catch (IOException e) {
-            throw new WebScriptException(Status.STATUS_INTERNAL_SERVER_ERROR, e.getMessage());
-        }
         AddoDocument document = new AddoDocument();
-        document.setData(fileBytes);
-        document.setMimeType(reader.getMimetype());
+        document.setData(getDocumentPdfBytes(documentNodeRef));
+        document.setMimeType(MimetypeMap.MIMETYPE_PDF);
         document.setName(title);
         return document;
     }
@@ -119,5 +108,10 @@ public class AddoInitiateSigningWebScript extends AbstractAddoWebscript {
                 ContactUtils.getAddress(props),
                 recipient.getString("displayName"),
                 (String) props.get(OpenESDHModel.PROP_CONTACT_PHONE));
+    }
+
+    private byte[] getDocumentPdfBytes(NodeRef documentNodeRef) throws IOException {
+        return IOUtils.toByteArray(documentPDFService.getDocumentPdfThumbnailStream(documentNodeRef)
+                .orElseThrow(() -> new WebScriptException("PDF Convertion error")));
     }
 }
