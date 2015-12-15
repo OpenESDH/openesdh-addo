@@ -36,7 +36,7 @@ public class AbstractAddoWebscript {
     protected String[] getUserNameAndPassword() {
         NodeRef user = getCurrentUserNodeRef();
         //email as user in addo
-        String email = (String) nodeService.getProperty(user, ContentModel.PROP_EMAIL);
+        String email = (String) nodeService.getProperty(user, PROP_ADDO_USERNAME);
         //saved encoded user password for addo
         String pw = (String) nodeService.getProperty(user, PROP_ADDO_PASSWORD);
         return new String[]{email, pw};
