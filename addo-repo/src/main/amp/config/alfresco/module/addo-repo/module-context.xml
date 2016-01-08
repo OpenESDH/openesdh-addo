@@ -6,12 +6,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
             http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-    
-    <bean id="addoService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
-        <property name="serviceUrl" value="rmi://localhost:10901/rmiAddoService"/>
-        <property name="serviceInterface" value="dk.openesdh.addo.services.AddoService"/>
-    </bean>
+    <import resource="classpath:alfresco/module/addo-repo/context/addo-model-context.xml" />
+    <import resource="classpath:alfresco/module/addo-repo/context/addo-resourcebundles-context.xml" />
+    <import resource="classpath:alfresco/module/addo-repo/context/addo-service-context.xml" />
     
     <context:annotation-config/>
-    <context:component-scan base-package="dk.openesdh.addo.webscipts" />
+    <context:component-scan base-package="dk.openesdh.addo.services,dk.openesdh.addo.webscipts" />
 </beans>
