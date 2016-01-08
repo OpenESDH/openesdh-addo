@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Audit xmlns="http://www.alfresco.org/repo/audit/model/3.2"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.alfresco.org/repo/audit/model/3.2 alfresco-audit-3.2.xsd">
+    
+    <DataExtractors>
+        <DataExtractor name="simpleValue" registeredName="auditModel.extractor.simpleValue"/>
+        <DataExtractor name="caseIDValue" registeredName="audit.dk.openesdh.CaseIDExtractor" />
+    </DataExtractors>
+
+    <PathMappings>
+        <PathMap source="/esdh-addo/initiatate-signing/caseId" target="/esdh-addo/case" />
+        <PathMap source="/esdh-addo/initiatate-signing" target="/esdh-addo/action/initiate" />
+    </PathMappings>
+
+    <Application name="esdh-addo" key="esdh-addo">
+        <AuditPath key="case">
+            <RecordValue key="value" dataExtractor="caseIDValue"/>
+        </AuditPath>
+        <AuditPath key="action">
+            <AuditPath key="initiate">
+                <RecordValue key="documents" dataExtractor="simpleValue" dataSource="/esdh-addo/action/initiate/documents" dataTrigger="/esdh-addo/action/initiate/documents" />
+                <RecordValue key="attachments" dataExtractor="simpleValue" dataSource="/esdh-addo/action/initiate/attachments" dataTrigger="/esdh-addo/action/initiate/attachments" />
+            </AuditPath>
+        </AuditPath>
+    </Application>
+</Audit>
+

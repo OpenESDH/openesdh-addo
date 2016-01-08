@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model name="addo:openesdhAddoModel" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+    <description>OpenE ADDO model</description>
+    <author>petraarn</author>
+    <version>1.0</version>
+
+    <imports>
+        <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+    </imports>
+    
+    <namespaces>
+        <namespace uri="http://openesdh.dk/model/addo/1.0" prefix="addo" />
+    </namespaces>
+
+    <aspects>
+        <aspect name="addo:addoSigned">
+            <properties>
+                <property name="addo:addoToken">
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                    </index>
+                </property>
+            </properties>
+        </aspect>
+        <aspect name="addo:addoCredentials">
+            <properties>
+                <property name="addo:addoUsername">
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                </property>
+                <property name="addo:addoPassword">
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                </property>
+            </properties>
+        </aspect>
+    </aspects>
+</model>

@@ -4,19 +4,17 @@ import com.github.dynamicextensionsalfresco.webscripts.annotations.HttpMethod;
 import com.github.dynamicextensionsalfresco.webscripts.annotations.Uri;
 import com.github.dynamicextensionsalfresco.webscripts.annotations.WebScript;
 import com.github.dynamicextensionsalfresco.webscripts.resolutions.Resolution;
-import dk.openesdh.addo.model.AddoDocument;
-import dk.openesdh.addo.model.AddoRecipient;
-import dk.openesdh.repo.model.OpenESDHModel;
-import dk.openesdh.repo.services.cases.CaseService;
-import dk.openesdh.repo.services.documents.DocumentPDFService;
-import dk.openesdh.repo.webscripts.contacts.ContactUtils;
-import dk.openesdh.repo.webscripts.utils.WebScriptUtils;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.audit.AuditComponent;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
@@ -30,6 +28,15 @@ import org.springframework.extensions.webscripts.WebScriptException;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.stereotype.Component;
 
+import dk.openesdh.addo.model.AddoDocument;
+import dk.openesdh.addo.model.AddoRecipient;
+import dk.openesdh.addo.models.AddoModel;
+import dk.openesdh.repo.model.OpenESDHModel;
+import dk.openesdh.repo.services.cases.CaseService;
+import dk.openesdh.repo.services.documents.DocumentPDFService;
+import dk.openesdh.repo.webscripts.contacts.ContactUtils;
+import dk.openesdh.repo.webscripts.utils.WebScriptUtils;
+
 @Component
 @WebScript(description = "Send Document To Visma Addo", families = {"Addo"})
 public class AddoInitiateSigningWebScript extends AbstractAddoWebscript {
@@ -40,6 +47,8 @@ public class AddoInitiateSigningWebScript extends AbstractAddoWebscript {
     private CaseService caseService;
     @Autowired
     private DocumentPDFService documentPDFService;
+    @Autowired
+    private AuditComponent audit;
 
     @Uri(value = "/api/openesdh/addo/InitiateSigning",
             method = HttpMethod.POST, defaultFormat = "json")
@@ -76,10 +85,25 @@ public class AddoInitiateSigningWebScript extends AbstractAddoWebscript {
                 receivers,
                 reqJSON.getBoolean("sequential")
         );
+
         LOG.info("Addo initiane signing result: " + addoSigningToken);
         NodeRef caseNodeRef = caseService.getCaseById(caseId);
-        nodeService.setProperty(caseNodeRef, PROP_CASE_ADDO_ID, addoSigningToken);
+
+        Map<QName, Serializable> props = new HashMap<>();
+        props.put(AddoModel.PROP_ADDO_TOKEN, addoSigningToken);
+        nodeService.addAspect(caseNodeRef, AddoModel.ASPECT_ADDO_SIGNED, props);
+
+        audit(caseId, documents, enclosureDocuments);
+
         return WebScriptUtils.jsonResolution(addoSigningToken);
+    }
+
+    private void audit(String caseId, List<AddoDocument> documents, List<AddoDocument> enclosureDocuments) {
+        Map<String, Serializable> auditValues = new HashMap<>();
+        auditValues.put("caseId", caseId);
+        auditValues.put("documents", documents.stream().map(AddoDocument::getName).collect(Collectors.joining("\", \"", "\"", "\"")));
+        auditValues.put("attachments", enclosureDocuments.stream().map(AddoDocument::getName).collect(Collectors.joining("\", \"", "\"", "\"")));
+        audit.recordAuditValues("/esdh-addo/initiatate-signing", auditValues);
     }
 
     private AddoDocument getDocument(String documentNodeRefId) throws IOException {
