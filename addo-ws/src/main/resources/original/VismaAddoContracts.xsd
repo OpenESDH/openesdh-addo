@@ -116,6 +116,7 @@
 			<xs:element minOccurs="0" name="MessageType" nillable="true" type="tns:MessageTypeEnum"/>
 			<xs:element minOccurs="0" name="NotificationInterval" nillable="true" type="tns:NotificationIntervalEnum"/>
 			<xs:element minOccurs="0" name="SigningMethod" nillable="true" type="tns:SigningMethodEnum"/>
+      <xs:element minOccurs="0" name="SmsVerification" nillable="true" type="xs:boolean"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:element name="TemplateOverride" nillable="true" type="tns:TemplateOverride"/>
@@ -378,7 +379,81 @@
 			<xs:element minOccurs="0" name="MessageType" type="tns:MessageTypeEnum"/>
 			<xs:element minOccurs="0" name="NotificationInterval" type="tns:NotificationIntervalEnum"/>
 			<xs:element minOccurs="0" name="SigningMethod" type="tns:SigningMethodEnum"/>
+      <xs:element minOccurs="0" name="SmsVerification" type="xs:boolean"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:element name="SigningTemplate" nillable="true" type="tns:SigningTemplate"/>
+  <xs:complexType name="GetSigningStatus">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Recipients" nillable="true" type="tns:ArrayOfGetSigningStatus.Recipient"/>
+      <xs:element minOccurs="0" name="SigningToken" nillable="true" type="xs:string"/>
+      <xs:element minOccurs="0" name="State" nillable="true" type="tns:SigningStateEnum"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GetSigningStatus" nillable="true" type="tns:GetSigningStatus"/>
+  <xs:complexType name="ArrayOfGetSigningStatus.Recipient">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="GetSigningStatus.Recipient" nillable="true" type="tns:GetSigningStatus.Recipient"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfGetSigningStatus.Recipient" nillable="true" type="tns:ArrayOfGetSigningStatus.Recipient"/>
+  <xs:complexType name="GetSigningStatus.Recipient">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string"/>
+      <xs:element minOccurs="0" name="Transactions" nillable="true" type="tns:ArrayOfGetSigningStatus.Transaction"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GetSigningStatus.Recipient" nillable="true" type="tns:GetSigningStatus.Recipient"/>
+  <xs:complexType name="ArrayOfGetSigningStatus.Transaction">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="GetSigningStatus.Transaction" nillable="true" type="tns:GetSigningStatus.Transaction"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfGetSigningStatus.Transaction" nillable="true" type="tns:ArrayOfGetSigningStatus.Transaction"/>
+  <xs:complexType name="GetSigningStatus.Transaction">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="TransactionToken" type="ser:guid"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GetSigningStatus.Transaction" nillable="true" type="tns:GetSigningStatus.Transaction"/>
+  <xs:simpleType name="SigningStateEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Created">
+        <xs:annotation>
+          <xs:appinfo>
+            <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1</EnumerationValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Started">
+        <xs:annotation>
+          <xs:appinfo>
+            <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2</EnumerationValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Completed">
+        <xs:annotation>
+          <xs:appinfo>
+            <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">3</EnumerationValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Expired">
+        <xs:annotation>
+          <xs:appinfo>
+            <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">4</EnumerationValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Stopped">
+        <xs:annotation>
+          <xs:appinfo>
+            <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">5</EnumerationValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="SigningStateEnum" nillable="true" type="tns:SigningStateEnum"/>
 </xs:schema>

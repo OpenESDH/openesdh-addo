@@ -104,7 +104,7 @@
 	<xs:element name="GetSigningStatusResponse">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element minOccurs="0" name="GetSigningStatusResult" nillable="true" type="q14:GetSigningSatus" xmlns:q14="http://schemas.vismaaddo.dk/services/signingservice/messages/generatedocumentrequest/2014/09"/>
+				<xs:element minOccurs="0" name="GetSigningStatusResult" nillable="true" type="q14:GetSigningStatus" xmlns:q14="http://schemas.datacontract.org/2004/07/Visma.Addo.WebService.Contracts.v1_0.Messages"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
