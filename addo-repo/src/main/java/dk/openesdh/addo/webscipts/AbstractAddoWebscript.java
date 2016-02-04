@@ -4,6 +4,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
+import org.alfresco.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,12 +28,12 @@ public class AbstractAddoWebscript {
         return authorityService.getAuthorityNodeRef(username);
     }
 
-    protected String[] getUserNameAndPassword() {
+    protected Pair<String, String> getUserNameAndPassword() {
         NodeRef user = getCurrentUserNodeRef();
         //email as user in addo
         String email = (String) nodeService.getProperty(user, AddoModel.PROP_ADDO_USERNAME);
         //saved encoded user password for addo
         String pw = (String) nodeService.getProperty(user, AddoModel.PROP_ADDO_PASSWORD);
-        return new String[]{email, pw};
+        return new Pair(email, pw);
     }
 }
