@@ -82,7 +82,7 @@ public class AddoInitiateSigningWebScript extends AbstractAddoWebscript {
 
         List<AddoRecipient> receivers = getRecipients(receiversJSON);
 
-        partyService.createParty(caseId, OpenESDHModel.CASE_PARTY_ROLE_SENDER,
+        partyService.addCaseParty(caseId, OpenESDHModel.CASE_PARTY_ROLE_SENDER,
                 receivers.stream().map(AddoRecipient::getEmail).collect(Collectors.toList()));
 
         Pair<String, String> userCred = getUserNameAndPassword();
