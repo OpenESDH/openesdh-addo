@@ -15,10 +15,11 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.Pair;
 import org.apache.commons.compress.utils.IOUtils;
-import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.extensions.webscripts.WebScriptException;
@@ -44,7 +45,7 @@ import dk.openesdh.repo.webscripts.utils.WebScriptUtils;
 @WebScript(description = "Send Document To Visma Addo", families = {"Addo"})
 public class AddoInitiateSigningWebScript extends AbstractAddoWebscript {
 
-    private static final Logger LOG = Logger.getLogger(AddoInitiateSigningWebScript.class);
+    private final Logger logger = LoggerFactory.getLogger(AddoInitiateSigningWebScript.class);
 
     @Autowired
     @Qualifier("CaseService")
@@ -98,7 +99,7 @@ public class AddoInitiateSigningWebScript extends AbstractAddoWebscript {
                 reqJSON.getBoolean("sequential")
         );
 
-        LOG.info("Addo initiane signing result: " + addoSigningToken);
+        logger.info("Addo initiane signing result: " + addoSigningToken);
         NodeRef caseNodeRef = caseService.getCaseById(caseId);
 
         Map<QName, Serializable> props = new HashMap<>();
