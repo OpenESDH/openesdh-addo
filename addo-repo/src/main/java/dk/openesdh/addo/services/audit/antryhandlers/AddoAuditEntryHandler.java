@@ -17,7 +17,7 @@ public class AddoAuditEntryHandler extends AuditEntryHandler {
     private static final String ADDO_ATTACHMENTS = "/esdh-addo/action/initiate/attachments";
 
     @Override
-    protected Optional<JSONObject> handleEntry(String user, long time, Map<String, Serializable> values) {
+    public Optional<JSONObject> handleEntry(String user, long time, Map<String, Serializable> values) {
         JSONObject auditEntry = createNewAuditEntry(user, time);
         String documents = (String) values.get(ADDO_DOCUMENTS);
         String attachments = (String) values.get(ADDO_ATTACHMENTS);
