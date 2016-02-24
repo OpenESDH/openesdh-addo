@@ -15,6 +15,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.Pair;
 import org.apache.commons.compress.utils.IOUtils;
+import org.codehaus.plexus.util.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -83,6 +84,8 @@ public class AddoInitiateSigningWebScript extends AbstractAddoWebscript {
 
         List<AddoRecipient> receivers = getRecipients(receiversJSON);
 
+        validateValues(templateJSON, receivers);
+
         partyService.addCaseParty(caseId, OpenESDHModel.CASE_PARTY_ROLE_SENDER,
                 receivers.stream().map(AddoRecipient::getEmail).collect(Collectors.toList()));
 
@@ -150,5 +153,28 @@ public class AddoInitiateSigningWebScript extends AbstractAddoWebscript {
     private byte[] getDocumentPdfBytes(NodeRef documentNodeRef) throws IOException {
         return IOUtils.toByteArray(documentPDFService.getDocumentPdfThumbnailStream(documentNodeRef)
                 .orElseThrow(() -> new WebScriptException("PDF Convertion error")));
+    }
+
+    /**
+     * Depending on the chosen signing template there are some required fields we need to be aware of for sending documents with Visma Addo
+     * If distribution equal e-mail then e-mail is required (true)
+     * If distribution equal SMS then phone no. is required
+     * If signing method equal NemID then CPR number is required (true)
+     * If "Encrypt document" is chosen then CPR number is required (true)
+     * If "Validate by phone" is chosen then phone no. is required
+     */
+    private void validateValues(JSONObject templateJSON, List<AddoRecipient> receivers) throws JSONException {
+        if ((templateJSON.has("MessageType") && "Sms".equals(templateJSON.getString("MessageType")))
+                || (templateJSON.has("SmsVerification") && templateJSON.getBoolean("SmsVerification"))) {
+
+            Object[] noPhones = receivers.stream()
+                    .filter(receiver -> StringUtils.isEmpty(receiver.getPhone()))
+                    .map(AddoRecipient::getName)
+                    .toArray();
+            if (noPhones.length == 0) {
+                throw new RuntimeException("Phone is required by signature template, but is not specified for: "
+                        + StringUtils.join(noPhones, ", "));
+            }
+        }
     }
 }
