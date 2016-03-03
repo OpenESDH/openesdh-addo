@@ -36,7 +36,6 @@
             <groupId>${alfresco.groupId}</groupId>
             <artifactId>alfresco-repository</artifactId>
         </dependency>
-    
         <dependency>
             <groupId>dk.openesdh</groupId>
             <artifactId>openesdh-repo</artifactId>
@@ -45,7 +44,6 @@
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
-        
         <dependency>
             <groupId>org.alfresco</groupId>
             <artifactId>alfresco-repository</artifactId>
@@ -53,7 +51,6 @@
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.alfresco</groupId>
             <artifactId>alfresco-remote-api</artifactId>
@@ -61,7 +58,6 @@
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.extensions.surf</groupId>
             <artifactId>spring-webscripts</artifactId>
@@ -69,14 +65,12 @@
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
-        
         <dependency>
             <groupId>com.github.dynamicextensionsalfresco</groupId>
             <artifactId>annotations</artifactId>
             <version>${dynamicextensionsalfresco.version}</version>
             <type>amp</type>
         </dependency>
-        
         <dependency>
             <groupId>com.github.dynamicextensionsalfresco</groupId>
             <artifactId>webscripts</artifactId>
@@ -87,6 +81,12 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>addo-common</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>dk.openesdh</groupId>
+            <artifactId>openesdh-doc-templates-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
 
