@@ -1,13 +1,14 @@
 package dk.openesdh.addo.services;
 
+import java.util.List;
+
 import dk.openesdh.addo.exception.AddoException;
 import dk.openesdh.addo.model.AddoDocument;
 import dk.openesdh.addo.model.AddoRecipient;
-import java.util.List;
 
 public interface AddoService {
 
-    public Boolean tryLogin(String username, String password) throws AddoException;
+    public Boolean tryLogin(String username, String password);
 
     public String getSigningTemplates(String username, String password) throws AddoException;
 

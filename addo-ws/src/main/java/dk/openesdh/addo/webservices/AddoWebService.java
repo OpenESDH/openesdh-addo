@@ -1,10 +1,10 @@
 package dk.openesdh.addo.webservices;
 
-import dk.vismaaddo.schemas.services.signingservice._2014._09.SigningService;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.util.Date;
 import java.util.GregorianCalendar;
+
 import javax.xml.bind.*;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -12,6 +12,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.soap.MTOMFeature;
 import javax.xml.ws.soap.SOAPFaultException;
+
 import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
@@ -21,6 +22,10 @@ import org.apache.cxf.ws.security.trust.STSClient;
 import org.datacontract.schemas._2004._07.visma_addo_webservice_contracts_v1_0.ValidationError;
 import org.json.XML;
 import org.tempuri.AddoSigningService;
+
+import dk.vismaaddo.schemas.services.signingservice._2014._09.SigningService;
+
+import dk.openesdh.addo.exception.AddoException;
 
 public class AddoWebService {
 
@@ -74,8 +79,8 @@ public class AddoWebService {
         }
     }
 
-    public void throwError(ValidationError err) {
-        throw new RuntimeException(err.getErrorCode() + ": " + err.getMessage().getValue());
+    public void throwError(ValidationError err) throws AddoException {
+        throw new AddoException(err.getMessage().getValue());
     }
 
     public XMLGregorianCalendar gregorianCalendarOf(Date date) {

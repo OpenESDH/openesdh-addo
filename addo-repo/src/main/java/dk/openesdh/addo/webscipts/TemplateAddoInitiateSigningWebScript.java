@@ -14,6 +14,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.Pair;
 import org.codehaus.plexus.util.StringUtils;
+import org.json.JSONException;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +32,12 @@ import com.github.dynamicextensionsalfresco.webscripts.annotations.UriVariable;
 import com.github.dynamicextensionsalfresco.webscripts.annotations.WebScript;
 import com.google.common.collect.Lists;
 
+import dk.openesdh.addo.exception.AddoException;
 import dk.openesdh.addo.model.AddoDocument;
 import dk.openesdh.addo.model.AddoRecipient;
 import dk.openesdh.doctemplates.api.model.OfficeTemplateMerged;
 import dk.openesdh.doctemplates.api.services.OfficeTemplateService;
+import dk.openesdh.repo.exceptions.DomainException;
 import dk.openesdh.repo.model.OpenESDHModel;
 import dk.openesdh.repo.webscripts.contacts.ContactUtils;
 import dk.openesdh.repo.webscripts.utils.WebScriptUtils;
@@ -60,13 +63,13 @@ public class TemplateAddoInitiateSigningWebScript extends AbstractAddoWebscript 
             @UriVariable final String node_id,
             @UriVariable final String caseId,
             WebScriptRequest req, WebScriptResponse res
-    ) throws Exception {
+    ) throws IOException, JSONException {
         if (officeTemplateService == null) {
             throw new RuntimeException("\"doc-templates\" module is unavailable");
         }
         JSONObject json = WebScriptUtils.readJson(req);
-        List<OfficeTemplateMerged> merged = officeTemplateService.getMergedTemplates(new NodeRef(store_type, store_id, node_id),
-                caseId, json);
+        List<OfficeTemplateMerged> merged = officeTemplateService.getMergedTemplates(
+                new NodeRef(store_type, store_id, node_id), caseId, json);
         JSONObject fieldData = (JSONObject) json.get("fieldData");
         JSONObject templateJSON = (JSONObject) fieldData.get("addo.template");
 
@@ -80,16 +83,24 @@ public class TemplateAddoInitiateSigningWebScript extends AbstractAddoWebscript 
         for (OfficeTemplateMerged doc : merged) {
             AddoDocument document = getDocument(doc);
             AddoRecipient recipient = recipientsMap.get(doc.getReceiver());
-            String addoSigningToken = service.initiateSigning(
-                    userCred.getFirst(),
-                    userCred.getSecond(),
-                    (String) templateJSON.get("Id"),
-                    (String) templateJSON.get("FriendlyName"),
-                    Arrays.asList(document),
-                    Collections.emptyList(),
-                    Arrays.asList(recipient),
-                    false
-            );
+            String addoSigningToken;
+            try {
+                addoSigningToken = service.initiateSigning(
+                        userCred.getFirst(),
+                        userCred.getSecond(),
+                        (String) templateJSON.get("Id"),
+                        (String) templateJSON.get("FriendlyName"),
+                        Arrays.asList(document),
+                        Collections.emptyList(),
+                        Arrays.asList(recipient),
+                        false
+                );
+            } catch (AddoException ex) {
+                if (ex.isDomainException()) {
+                    throw new DomainException(ex.getMessage());
+                }
+                throw new RuntimeException(ex);
+            }
             logger.info("Addo initiane signing result for \"{}\": {}", document.getName(), addoSigningToken);
             audit(caseId, document);
         }
@@ -137,7 +148,7 @@ public class TemplateAddoInitiateSigningWebScript extends AbstractAddoWebscript 
      * If "Encrypt document" is chosen then CPR number is required (true)
      * If "Validate by phone" is chosen then phone no. is required
      */
-    private void validateValues(JSONObject templateJSON, Collection<AddoRecipient> receivers) {
+    private void validateValues(JSONObject templateJSON, Collection<AddoRecipient> receivers) throws JSONException {
         if ((templateJSON.containsKey("MessageType") && "Sms".equals((String) templateJSON.get("MessageType")))
                 || (templateJSON.containsKey("SmsVerification") && (Boolean) templateJSON.get("SmsVerification"))) {
 
@@ -146,8 +157,8 @@ public class TemplateAddoInitiateSigningWebScript extends AbstractAddoWebscript 
                     .map(AddoRecipient::getName)
                     .toArray();
             if (noPhones.length == 0) {
-                throw new RuntimeException("Phone is required by signature template, but is not specified for: "
-                        + StringUtils.join(noPhones, ", "));
+                throw new DomainException("ADDO.ERROR.REQUIRED_PHONE_EMPTY_FOR_RECEIVERS",
+                        new org.json.JSONObject().put("receivers", StringUtils.join(noPhones, ", ")));
             }
         }
     }

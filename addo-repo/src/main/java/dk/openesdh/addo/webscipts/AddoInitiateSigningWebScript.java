@@ -32,9 +32,11 @@ import com.github.dynamicextensionsalfresco.webscripts.annotations.Uri;
 import com.github.dynamicextensionsalfresco.webscripts.annotations.WebScript;
 import com.github.dynamicextensionsalfresco.webscripts.resolutions.Resolution;
 
+import dk.openesdh.addo.exception.AddoException;
 import dk.openesdh.addo.model.AddoDocument;
 import dk.openesdh.addo.model.AddoRecipient;
 import dk.openesdh.addo.models.AddoModel;
+import dk.openesdh.repo.exceptions.DomainException;
 import dk.openesdh.repo.model.OpenESDHModel;
 import dk.openesdh.repo.services.cases.CaseService;
 import dk.openesdh.repo.services.cases.PartyService;
@@ -91,16 +93,24 @@ public class AddoInitiateSigningWebScript extends AbstractAddoWebscript {
 
         Pair<String, String> userCred = getUserNameAndPassword();
 
-        String addoSigningToken = service.initiateSigning(
-                userCred.getFirst(),
-                userCred.getSecond(),
-                templateJSON.getString("Id"),
-                templateJSON.getString("FriendlyName"),
-                documents,
-                enclosureDocuments,
-                receivers,
-                reqJSON.getBoolean("sequential")
-        );
+        String addoSigningToken;
+        try {
+            addoSigningToken = service.initiateSigning(
+                    userCred.getFirst(),
+                    userCred.getSecond(),
+                    templateJSON.getString("Id"),
+                    templateJSON.getString("FriendlyName"),
+                    documents,
+                    enclosureDocuments,
+                    receivers,
+                    reqJSON.getBoolean("sequential")
+            );
+        } catch (AddoException ex) {
+            if (ex.isDomainException()) {
+                throw new DomainException(ex.getMessage());
+            }
+            throw new RuntimeException(ex);
+        }
 
         logger.info("Addo initiane signing result: " + addoSigningToken);
         NodeRef caseNodeRef = caseService.getCaseById(caseId);
@@ -171,9 +181,9 @@ public class AddoInitiateSigningWebScript extends AbstractAddoWebscript {
                     .filter(receiver -> StringUtils.isEmpty(receiver.getPhone()))
                     .map(AddoRecipient::getName)
                     .toArray();
-            if (noPhones.length == 0) {
-                throw new RuntimeException("Phone is required by signature template, but is not specified for: "
-                        + StringUtils.join(noPhones, ", "));
+            if (noPhones.length >= 0) {
+                throw new DomainException("ADDO.ERROR.REQUIRED_PHONE_EMPTY_FOR_RECEIVERS",
+                        new JSONObject().put("receivers", StringUtils.join(noPhones, ", ")));
             }
         }
     }

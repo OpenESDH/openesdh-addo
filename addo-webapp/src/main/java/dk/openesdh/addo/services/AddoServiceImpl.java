@@ -182,10 +182,9 @@ public class AddoServiceImpl implements AddoService {
             return initiateSigning.getSigningToken().getValue();
         }
         ArrayOfValidationError errors = initiateSigning.getValidationData().getValue().getValidationErrors().getValue();
-        errors.getValidationError()
-                .stream()
-                .findFirst()
-                .ifPresent(webService::throwError);
+        if (errors.getValidationError().size() > 0) {
+            webService.throwError(errors.getValidationError().get(0));
+        }
         throw new RuntimeException("Signing token is missing");
     }
 

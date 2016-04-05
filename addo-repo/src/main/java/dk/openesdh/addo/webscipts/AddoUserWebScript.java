@@ -1,12 +1,5 @@
 package dk.openesdh.addo.webscipts;
 
-import com.github.dynamicextensionsalfresco.webscripts.annotations.HttpMethod;
-import com.github.dynamicextensionsalfresco.webscripts.annotations.RequestParam;
-import com.github.dynamicextensionsalfresco.webscripts.annotations.Uri;
-import com.github.dynamicextensionsalfresco.webscripts.annotations.UriVariable;
-import com.github.dynamicextensionsalfresco.webscripts.annotations.WebScript;
-import com.github.dynamicextensionsalfresco.webscripts.resolutions.Resolution;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,11 +8,18 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.extensions.webscripts.WebScriptException;
 import org.springframework.stereotype.Component;
+
+import com.github.dynamicextensionsalfresco.webscripts.annotations.HttpMethod;
+import com.github.dynamicextensionsalfresco.webscripts.annotations.RequestParam;
+import com.github.dynamicextensionsalfresco.webscripts.annotations.Uri;
+import com.github.dynamicextensionsalfresco.webscripts.annotations.UriVariable;
+import com.github.dynamicextensionsalfresco.webscripts.annotations.WebScript;
+import com.github.dynamicextensionsalfresco.webscripts.resolutions.Resolution;
 
 import dk.openesdh.addo.model.AddoPasswordEncoder;
 import dk.openesdh.addo.models.AddoModel;
+import dk.openesdh.repo.exceptions.DomainException;
 import dk.openesdh.repo.webscripts.utils.WebScriptUtils;
 
 @Component
@@ -34,7 +34,7 @@ public class AddoUserWebScript extends AbstractAddoWebscript {
         NodeRef user = authorityService.getAuthorityNodeRef(username);
         String password = AddoPasswordEncoder.encode(addoPassword);
         if (!service.tryLogin(addoUsername, password)) {
-            throw new WebScriptException("ADDO.USER.INCORECT_PASSWORD");
+            throw new DomainException("ADDO.USER.INCORECT_PASSWORD");
         }
         Map<QName, Serializable> props = new HashMap<>();
         props.put(AddoModel.PROP_ADDO_USERNAME, addoUsername);

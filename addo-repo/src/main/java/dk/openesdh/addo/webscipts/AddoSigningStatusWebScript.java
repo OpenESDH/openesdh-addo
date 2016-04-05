@@ -7,7 +7,6 @@ import org.alfresco.util.Pair;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.extensions.webscripts.WebScriptException;
 import org.springframework.stereotype.Component;
 
 import com.github.dynamicextensionsalfresco.webscripts.annotations.HttpMethod;
@@ -40,6 +39,6 @@ public class AddoSigningStatusWebScript extends AbstractAddoWebscript {
             signingStatusJSON.put("state", AddoDocumentStatus.of(signingStatusJSON.getInt("StateID")));
             return WebScriptUtils.jsonResolution(signingStatusJSON);
         }
-        throw new WebScriptException("No ADDO association");
+        throw new RuntimeException("No ADDO association");
     }
 }

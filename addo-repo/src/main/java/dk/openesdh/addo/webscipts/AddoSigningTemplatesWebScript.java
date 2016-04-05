@@ -11,6 +11,8 @@ import com.github.dynamicextensionsalfresco.webscripts.annotations.Uri;
 import com.github.dynamicextensionsalfresco.webscripts.annotations.WebScript;
 import com.github.dynamicextensionsalfresco.webscripts.resolutions.Resolution;
 
+import dk.openesdh.addo.exception.AddoException;
+import dk.openesdh.repo.exceptions.DomainException;
 import dk.openesdh.repo.webscripts.utils.WebScriptUtils;
 
 @Component
@@ -20,8 +22,15 @@ public class AddoSigningTemplatesWebScript extends AbstractAddoWebscript {
     @Uri(value = "/api/openesdh/addo/SigningTemplates", method = HttpMethod.GET, defaultFormat = "json")
     public Resolution getSigningTemplates(WebScriptRequest req) throws JSONException {
         Pair<String, String> user = getUserNameAndPassword();
-        return WebScriptUtils.jsonResolution(new JSONObject(
-                service.getSigningTemplates(user.getFirst(), user.getSecond())
-        ));
+        try {
+            return WebScriptUtils.jsonResolution(new JSONObject(
+                    service.getSigningTemplates(user.getFirst(), user.getSecond())
+            ));
+        } catch (AddoException ex) {
+            if (ex.isDomainException()) {
+                throw new DomainException(ex.getMessage());
+            }
+            throw new RuntimeException(ex);
+        }
     }
 }
