@@ -40,6 +40,7 @@ import dk.openesdh.repo.exceptions.DomainException;
 import dk.openesdh.repo.model.OpenESDHModel;
 import dk.openesdh.repo.services.cases.CaseService;
 import dk.openesdh.repo.services.cases.PartyService;
+import dk.openesdh.repo.services.contacts.PartyRoleService;
 import dk.openesdh.repo.services.documents.DocumentPDFService;
 import dk.openesdh.repo.webscripts.contacts.ContactUtils;
 import dk.openesdh.repo.webscripts.utils.WebScriptUtils;
@@ -60,8 +61,11 @@ public class AddoInitiateSigningWebScript extends AbstractAddoWebscript {
     @Qualifier("auditComponent")
     private AuditComponent audit;
     @Autowired
-    @Qualifier("PartyService")
+    @Qualifier(PartyService.BEAN_ID)
     private PartyService partyService;
+    @Autowired
+    @Qualifier("PartyRoleService")
+    private PartyRoleService partyRoleService;
 
     @Uri(value = "/api/openesdh/addo/InitiateSigning",
             method = HttpMethod.POST, defaultFormat = "json")
@@ -88,7 +92,7 @@ public class AddoInitiateSigningWebScript extends AbstractAddoWebscript {
 
         validateValues(templateJSON, receivers);
 
-        partyService.addCaseParty(caseId, OpenESDHModel.CASE_PARTY_ROLE_SENDER,
+        partyService.addCaseParty(caseId, getMemberPartyRole(),
                 receivers.stream().map(AddoRecipient::getEmail).collect(Collectors.toList()));
 
         Pair<String, String> userCred = getUserNameAndPassword();
@@ -122,6 +126,10 @@ public class AddoInitiateSigningWebScript extends AbstractAddoWebscript {
         audit(caseId, documents, enclosureDocuments);
 
         return WebScriptUtils.jsonResolution(addoSigningToken);
+    }
+
+    private NodeRef getMemberPartyRole() {
+        return partyRoleService.getClassifValueByName(PartyRoleService.MEMBER_ROLE).get().getNodeRef();
     }
 
     private void audit(String caseId, List<AddoDocument> documents, List<AddoDocument> enclosureDocuments) {
