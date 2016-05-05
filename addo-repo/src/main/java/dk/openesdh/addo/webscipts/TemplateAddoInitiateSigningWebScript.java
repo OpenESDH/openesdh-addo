@@ -56,12 +56,15 @@ public class TemplateAddoInitiateSigningWebScript extends AbstractAddoWebscript 
     private OfficeTemplateService officeTemplateService;
 
     @Transaction(TransactionType.REQUIRED)
-    @Uri(value = "/api/openesdh/template/{store_type}/{store_id}/{node_id}/case/{caseId}/fillToAddo", method = HttpMethod.POST, defaultFormat = "json")
+    @Uri(value = "/api/openesdh/template/{store_type}/{store_id}/{node_id}/case/{caseId}/folder/{folderStoreType}/{folderStoreId}/{folderNodeId}/fillToAddo", method = HttpMethod.POST, defaultFormat = "json")
     public void fillToAddo(
             @UriVariable final String store_type,
             @UriVariable final String store_id,
             @UriVariable final String node_id,
             @UriVariable final String caseId,
+            @UriVariable final String folderStoreType,
+            @UriVariable final String folderStoreId,
+            @UriVariable final String folderNodeId,
             WebScriptRequest req, WebScriptResponse res
     ) throws IOException, JSONException {
         if (officeTemplateService == null) {
@@ -105,7 +108,7 @@ public class TemplateAddoInitiateSigningWebScript extends AbstractAddoWebscript 
             audit(caseId, document);
         }
 
-        officeTemplateService.saveToCase(caseId, merged);
+        officeTemplateService.saveToFolder(new NodeRef(folderStoreType, folderStoreId, folderNodeId), merged);
 
         /*NodeRef caseNodeRef = caseService.getCaseById(caseId);
 
