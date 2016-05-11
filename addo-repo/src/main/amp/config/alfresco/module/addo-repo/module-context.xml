@@ -7,7 +7,6 @@
             http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
     <import resource="classpath:alfresco/module/addo-repo/context/addo-model-context.xml" />
-    <import resource="classpath:alfresco/module/addo-repo/context/addo-resourcebundles-context.xml" />
     <import resource="classpath:alfresco/module/addo-repo/context/addo-service-context.xml" />
     
     <context:annotation-config/>

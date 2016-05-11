@@ -8,12 +8,11 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.extensions.surf.util.I18NUtil;
 import org.springframework.stereotype.Component;
 
 import dk.openesdh.addo.models.AddoModel;
+import dk.openesdh.repo.services.audit.AuditEntry;
 import dk.openesdh.repo.services.audit.AuditEntryHandler;
 import dk.openesdh.repo.services.audit.AuditSearchService;
 
@@ -34,17 +33,21 @@ public class AddoAuditEntryHandler extends AuditEntryHandler {
     }
 
     @Override
-    public Optional<JSONObject> handleEntry(String user, long time, Map<String, Serializable> values) {
-        JSONObject auditEntry = createNewAuditEntry(user, time);
+    public Optional<AuditEntry> handleEntry(String user, long time, Map<String, Serializable> values) {
+        AuditEntry auditEntry = new AuditEntry(user, time);
+        auditEntry.setType(REC_TYPE.DOCUMENT);
+
         String documents = (String) values.get(ADDO_DOCUMENTS);
         String attachments = (String) values.get(ADDO_ATTACHMENTS);
-        if (StringUtils.isNotEmpty(attachments)) {
-            attachments = " " + I18NUtil.getMessage("auditlog.label.addo.initiate.attachments", attachments);
+
+        String docsCount = BooleanUtils.toString(documents.contains(", "), "n", "1");
+        auditEntry.addData("documents", documents);
+        if (StringUtils.isEmpty(attachments)) {
+            auditEntry.setAction("ADDO.auditlog.INITIATE_" + docsCount);
+        } else {
+            auditEntry.setAction("ADDO.auditlog.INITIATE_WITH_ATTACHMENTS_" + docsCount);
+            auditEntry.addData("attachments", attachments);
         }
-        auditEntry.put(ACTION, I18NUtil.getMessage("auditlog.label.addo.initiate."
-                + BooleanUtils.toString(documents.contains(", "), "n", "1"),
-                documents) + attachments);
-        auditEntry.put(TYPE, getTypeMessage("document"));
         return Optional.of(auditEntry);
     }
 }

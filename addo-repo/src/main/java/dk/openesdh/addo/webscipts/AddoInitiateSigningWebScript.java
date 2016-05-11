@@ -135,9 +135,16 @@ public class AddoInitiateSigningWebScript extends AbstractAddoWebscript {
     private void audit(String caseId, List<AddoDocument> documents, List<AddoDocument> enclosureDocuments) {
         Map<String, Serializable> auditValues = new HashMap<>();
         auditValues.put("caseId", caseId);
-        auditValues.put("documents", documents.stream().map(AddoDocument::getName).collect(Collectors.joining("\", \"", "\"", "\"")));
-        auditValues.put("attachments", enclosureDocuments.stream().map(AddoDocument::getName).collect(Collectors.joining("\", \"", "\"", "\"")));
+        auditValues.put("documents", getDocumentNames(documents));
+        auditValues.put("attachments", getDocumentNames(enclosureDocuments));
         audit.recordAuditValues("/esdh-addo/initiatate-signing", auditValues);
+    }
+
+    private String getDocumentNames(List<AddoDocument> list) {
+        return list.isEmpty() ? ""
+                : list.stream()
+                .map(AddoDocument::getName)
+                .collect(Collectors.joining(","));
     }
 
     private AddoDocument getDocument(String documentNodeRefId) throws IOException {
