@@ -45,8 +45,7 @@ public class AddoAuditEntryHandler extends AuditEntryHandler {
     }
 
     @Override
-    public Optional<AuditEntry> handleEntry(String user, long time, Map<String, Serializable> values) {
-        AuditEntry auditEntry = new AuditEntry(user, time);
+    public Optional<AuditEntry> handleEntry(AuditEntry auditEntry, Map<String, Serializable> values) {
         auditEntry.setType(DOCUMENT);
 
         List<String> documents = getDocumentsList(values.get(ADDO_DOCUMENTS));
