@@ -1,5 +1,7 @@
 package dk.openesdh.addo.webscipts;
 
+import static dk.openesdh.repo.services.audit.entryhandlers.TransactionPathAuditEntryHandler.TRANSACTION_PATH;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,6 +14,8 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.audit.AuditComponent;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.Pair;
 import org.apache.commons.compress.utils.IOUtils;
@@ -31,6 +35,7 @@ import com.github.dynamicextensionsalfresco.webscripts.annotations.HttpMethod;
 import com.github.dynamicextensionsalfresco.webscripts.annotations.Uri;
 import com.github.dynamicextensionsalfresco.webscripts.annotations.WebScript;
 import com.github.dynamicextensionsalfresco.webscripts.resolutions.Resolution;
+import com.google.common.collect.ImmutableMap;
 
 import dk.openesdh.addo.exception.AddoException;
 import dk.openesdh.addo.model.AddoDocument;
@@ -38,6 +43,7 @@ import dk.openesdh.addo.model.AddoRecipient;
 import dk.openesdh.addo.models.AddoModel;
 import dk.openesdh.repo.exceptions.DomainException;
 import dk.openesdh.repo.model.OpenESDHModel;
+import dk.openesdh.repo.services.audit.AuditUtils;
 import dk.openesdh.repo.services.cases.CaseService;
 import dk.openesdh.repo.services.cases.PartyService;
 import dk.openesdh.repo.services.contacts.PartyRoleService;
@@ -66,6 +72,9 @@ public class AddoInitiateSigningWebScript extends AbstractAddoWebscript {
     @Autowired
     @Qualifier("PartyRoleService")
     private PartyRoleService partyRoleService;
+    @Autowired
+    @Qualifier("NamespaceService")
+    private NamespaceService namespaceService;
 
     @Uri(value = "/api/openesdh/addo/InitiateSigning",
             method = HttpMethod.POST, defaultFormat = "json")
@@ -140,17 +149,22 @@ public class AddoInitiateSigningWebScript extends AbstractAddoWebscript {
         audit.recordAuditValues("/esdh-addo/initiatate-signing", auditValues);
     }
 
-    private String getDocumentNames(List<AddoDocument> list) {
-        return list.isEmpty() ? ""
-                : list.stream()
-                .map(AddoDocument::getName)
-                .collect(Collectors.joining(","));
+    private ArrayList getDocumentNames(List<AddoDocument> list) {
+        ArrayList<String> documents = new ArrayList<>();
+        for (AddoDocument addoDocument : list) {
+            String title = addoDocument.getName();
+            Path path = nodeService.getPath(new NodeRef(addoDocument.getId()));
+            String docPath = AuditUtils.getDocumentPath(ImmutableMap.of(TRANSACTION_PATH, path.toPrefixString(namespaceService)));
+            documents.add(docPath + title);
+        }
+        return documents;
     }
 
     private AddoDocument getDocument(String documentNodeRefId) throws IOException {
         NodeRef documentNodeRef = new NodeRef(documentNodeRefId);
         String title = (String) nodeService.getProperty(documentNodeRef, ContentModel.PROP_TITLE);
         AddoDocument document = new AddoDocument();
+        document.setId(documentNodeRefId);
         document.setData(getDocumentPdfBytes(documentNodeRef));
         document.setMimeType(MimetypeMap.MIMETYPE_PDF);
         document.setName(title);
